@@ -5,14 +5,16 @@ import WritingItem from './WritingItem';
 
 const WritingList = ({ writings }) => (
   <ul>
-    {writings.map(writing => (
-      <WritingItem writing={writing} />
+    {Object.entries(writings).map(([id, writing]) => (
+      <WritingItem key={id} id={id} writing={writing} />
     ))}
   </ul>
 );
 
 WritingList.propTypes = {
-  writings: PropTypes.arrayOf(PropTypes.string).isRequired,
+  writings: PropTypes.shape({
+    [PropTypes.string]: PropTypes.string,
+  }).isRequired,
 };
 
 export default WritingList;

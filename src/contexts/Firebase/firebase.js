@@ -8,10 +8,7 @@ class Firebase {
   constructor() {
     app.initializeApp(firebaseConfig);
     this.auth = app.auth();
-    this.databaseRef = ref => app
-      .database()
-      .ref(`users/${ref}`)
-      .child('writings');
+    this.database = app.database();
   }
 
   createUser({ email, password }) {
@@ -30,14 +27,20 @@ class Firebase {
     return this.databaseRef(`${userId}`).push('Write here...').key;
   }
 
-  // async getTitles(userId) {
-  //   const value = await this.app
-  //     .database()
-  //     .ref(`users/${userId}`)
-  //     .once('writings');
+  getTitles(userId) {
+    const data = {};
 
-  //   return Object.keys(value);
-  // }
+    this.database
+      .ref()
+      .child(`users/${userId}/writings`)
+      .once('value', (snapshot) => {
+        snapshot.forEach((child) => {
+          data[child.key] = child.val();
+        });
+      });
+
+    return data;
+  }
 
   // async updateWriting(userId, postKey, writing) {
 
