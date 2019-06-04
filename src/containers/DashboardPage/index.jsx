@@ -2,6 +2,9 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import { compose } from 'recompose';
+import { withRouter } from 'react-router-dom';
+import ReactRouterPropTypes from 'react-router-prop-types';
+
 import { withTheme } from '../../contexts/Theme';
 import SignOut from '../../components/SignOut';
 import WritingList from '../../components/WritingsList';
@@ -10,11 +13,24 @@ import { withAuthorization, withAuthUser } from '../../contexts/Session';
 import Firebase, { withFirebase } from '../../contexts/Firebase';
 
 const DashboardPage = ({
-  firebase, theme, toggleTheme, user,
+  firebase, theme, toggleTheme, user, history,
 }) => {
+  const [writings, setWritings] = React.useState({});
+
+  React.useEffect(() => {
+    async function fetchAll() {
+      if (user) {
+        const data = await firebase.getWritings(user);
+        setWritings(data);
+      }
+    }
+
+    fetchAll();
+  }, [user, firebase]);
+
   const addWriting = () => {
-    const key = firebase.createWriting(user);
-    console.log(key);
+    const key = firebase.addWriting(user);
+    history.push(`write/${key}`);
   };
 
   return (
@@ -36,7 +52,7 @@ const DashboardPage = ({
         </button>
       </div>
       <div>
-        <WritingList writings={['abc', 'efg', 'hij']} />
+        <WritingList writings={writings} />
       </div>
     </div>
   );
@@ -47,6 +63,7 @@ DashboardPage.propTypes = {
   theme: customProps.theme.isRequired,
   toggleTheme: customProps.toggleTheme.isRequired,
   user: PropTypes.string,
+  history: ReactRouterPropTypes.history.isRequired,
 };
 
 DashboardPage.defaultProps = {
@@ -58,6 +75,7 @@ const condition = user => !!user;
 export default compose(
   withTheme,
   withFirebase,
+  withRouter,
   withAuthUser('uid'),
   withAuthorization(condition),
 )(DashboardPage);

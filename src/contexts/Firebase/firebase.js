@@ -8,10 +8,8 @@ class Firebase {
   constructor() {
     app.initializeApp(firebaseConfig);
     this.auth = app.auth();
-    this.databaseRef = ref => app
-      .database()
-      .ref(`users/${ref}`)
-      .child('writings');
+    this.database = app.database();
+    this.databaseRef = ref => this.database.ref(`users/${ref}`);
   }
 
   createUser({ email, password }) {
@@ -26,18 +24,33 @@ class Firebase {
     this.auth.signOut();
   }
 
-  createWriting(userId) {
-    return this.databaseRef(`${userId}`).push('Write here...').key;
+  addWriting(userId) {
+    return this.databaseRef(userId)
+      .child('writings')
+      .push('Write here...').key;
   }
 
-  // async getTitles(userId) {
-  //   const value = await this.app
-  //     .database()
-  //     .ref(`users/${userId}`)
-  //     .once('writings');
+  async getWritings(userId) {
+    const snapshot = await this.databaseRef(userId)
+      .child('writings')
+      .once('value');
 
-  //   return Object.keys(value);
-  // }
+    const value = {};
+
+    snapshot.forEach((child) => {
+      value[child.key] = child.val();
+    });
+
+    return value;
+  }
+
+  async getWriting(userId, id) {
+    const snapshot = await this.databaseRef(userId)
+      .child(`writings/${id}`)
+      .once('value');
+
+    return snapshot.val();
+  }
 
   // async updateWriting(userId, postKey, writing) {
 
