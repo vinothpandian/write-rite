@@ -19,8 +19,8 @@ serviceWorker.unregister();
 
 // Tasks
 // Dashboard
-// TODO: * Login Google + email), logout
-// TODO: * Toggle dark / light
+// DONE: * Login Google + email), logout
+// DONE: * Toggle dark / light
 // TODO: * List writings
 
 // Writing:

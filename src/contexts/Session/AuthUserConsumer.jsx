@@ -2,9 +2,14 @@ import * as React from 'react';
 
 import AuthUserContext from './context';
 
-const withAuthUser = Component => props => (
+const withAuthUser = (property = 'all') => Component => props => (
   <AuthUserContext.Consumer>
-    {authUser => <Component {...props} authUser={authUser} />}
+    {(authUser) => {
+      if (authUser && property in authUser) {
+        return <Component {...props} user={authUser[property]} />;
+      }
+      return <Component {...props} user={authUser} />;
+    }}
   </AuthUserContext.Consumer>
 );
 

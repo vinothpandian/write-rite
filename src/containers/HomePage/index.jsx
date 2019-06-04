@@ -7,10 +7,10 @@ import SignIn from '../../components/SignIn';
 import { withAuthUser } from '../../contexts/Session';
 import { DASHBOARD } from '../../constants/routes';
 
-const HomePage = ({ authUser }) => (
+const HomePage = ({ user }) => (
   <div>
     Some information about write-rite
-    {authUser ? (
+    {user ? (
       <div>
         <ul>
           <li>
@@ -32,7 +32,7 @@ const HomePage = ({ authUser }) => (
 HomePage.propTypes = {
   // Disable eslint from checking prop-type of firebase user
   // eslint-disable-next-line
-  authUser: PropTypes.any,
+  user: PropTypes.any,
 };
 
-export default compose(withAuthUser)(HomePage);
+export default compose(withAuthUser())(HomePage);

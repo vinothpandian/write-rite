@@ -27,7 +27,7 @@ class Firebase {
   }
 
   createWriting(userId) {
-    return this.databaseRef(`${userId}`).push().key;
+    return this.databaseRef(`${userId}`).push('Write here...').key;
   }
 
   // async getTitles(userId) {
