@@ -52,9 +52,13 @@ class Firebase {
     return snapshot.val();
   }
 
-  // async updateWriting(userId, postKey, writing) {
-
-  // }
+  saveWriting(userId, id, writing) {
+    this.databaseRef(userId)
+      .child('writings')
+      .update({
+        [id]: writing,
+      });
+  }
 }
 
 export default Firebase;
