@@ -3,6 +3,7 @@
   "globals": {
     "document": true,
     "localStorage": true,
-    "window": true
+    "window": true,
+    "navigator": true
   }
 }
