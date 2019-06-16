@@ -8,6 +8,7 @@ import { withRouter } from 'react-router';
 import { validateField as validate, validateEmail } from '../../utils';
 import Firebase, { withFirebase } from '../../contexts/Firebase';
 import { DASHBOARD } from '../../constants/routes';
+import Button from '../Button';
 
 const SignIn = props => (
   <Formik
@@ -41,19 +42,20 @@ const SignIn = props => (
           </div>
 
           <div>
-            <button
+            <Button
               type="button"
+              color="red"
               disabled={typeof errors.email !== 'undefined' || !dirty}
               onClick={resetPassword}
             >
               Reset Password
-            </button>
+            </Button>
           </div>
 
           <div>
-            <button disabled={!isValid} type="submit">
+            <Button color="blue" disabled={!isValid} type="submit">
               Sign in
-            </button>
+            </Button>
           </div>
         </form>
       );
