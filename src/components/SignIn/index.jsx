@@ -2,65 +2,65 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import ReactRouterPropTypes from 'react-router-prop-types';
 
-import { Field, Formik } from 'formik';
+import { Formik } from 'formik';
+import { string, object } from 'yup';
 import { compose } from 'recompose';
 import { withRouter } from 'react-router';
-import { validateField as validate, validateEmail } from '../../utils';
+import Form from 'react-bootstrap/Form';
+import Col from 'react-bootstrap/Col';
+import Button from 'react-bootstrap/Button';
 import Firebase, { withFirebase } from '../../contexts/Firebase';
 import { DASHBOARD } from '../../constants/routes';
-import Button from '../Button';
+
+const schema = object({
+  email: string()
+    .email()
+    .required(),
+  password: string().required(),
+});
 
 const SignIn = props => (
   <Formik
+    validationSchema={schema}
     initialValues={{ email: '', password: '' }}
     onSubmit={(values) => {
       const { firebase, history } = props;
       firebase.signInUser(values);
       history.push(DASHBOARD);
     }}
-    render={(formikProps) => {
-      const {
-        touched, errors, dirty, isValid, handleSubmit,
-      } = formikProps;
-
-      const resetPassword = () => {
-        console.log('Reset Password');
-      };
-
-      return (
-        <form onSubmit={handleSubmit}>
-          <div>
-            <span>Email</span>
-            <Field type="email" validate={validateEmail} name="email" />
-            {touched.email && errors.email && <div>{errors.email}</div>}
-          </div>
-
-          <div>
-            <span>Password</span>
-            <Field type="password" validate={validate} name="password" />
-            {touched.password && errors.password && <div>{errors.password}</div>}
-          </div>
-
-          <div>
-            <Button
-              type="button"
-              color="red"
-              disabled={typeof errors.email !== 'undefined' || !dirty}
-              onClick={resetPassword}
-            >
-              Reset Password
-            </Button>
-          </div>
-
-          <div>
-            <Button color="blue" disabled={!isValid} type="submit">
-              Sign in
-            </Button>
-          </div>
-        </form>
-      );
-    }}
-  />
+  >
+    {({
+      handleSubmit, handleChange, values, errors,
+    }) => (
+      <Form noValidate onSubmit={handleSubmit}>
+        <Form.Row>
+          <Form.Group as={Col} md="4" controlId="validationFormik01">
+            <Form.Label>Email</Form.Label>
+            <Form.Control
+              type="email"
+              name="email"
+              value={values.email}
+              onChange={handleChange}
+              isInvalid={!!errors.email}
+            />
+            <Form.Control.Feedback type="invalid">{errors.email}</Form.Control.Feedback>
+          </Form.Group>
+          <Form.Group as={Col} md="6" controlId="validationFormik02">
+            <Form.Label>Password</Form.Label>
+            <Form.Control
+              type="password"
+              name="password"
+              value={values.password}
+              onChange={handleChange}
+              isInvalid={!!errors.password}
+            />
+            <Form.Control.Feedback type="invalid">{errors.password}</Form.Control.Feedback>
+          </Form.Group>
+        </Form.Row>
+        <Button type="submit">Sign in</Button>
+      </Form>
+    )}
+  </Formik>
 );
 
 SignIn.propTypes = {

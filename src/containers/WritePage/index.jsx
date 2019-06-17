@@ -37,32 +37,41 @@ const WritePage = ({ user, firebase, match }) => {
   };
 
   const handleChange = (event) => {
+    const userAgent = navigator.userAgent.toLowerCase();
     let { value } = event.target;
 
-    const userAgent = navigator.userAgent.toLowerCase();
+    // value = value.replace(/<br>/gi, '');
+
+    // const parser = new DOMParser();
+    // const doc = parser.parseFromString(value, 'text/html');
+    // const divs = doc.querySelectorAll('div');
+
+    // const lastDiv = divs[divs.length - 1];
+    // const { innerHTML } = lastDiv;
+
+    // lastDiv.innerHTML = `booyea ${innerHTML}`;
+
+    value = value
+      .replace(/<div>/gi, '')
+      .replace(/<\/div>/gi, '')
+      .replace(/<br>/gi, '<div><br/></div>');
+    value = value.replace(/^(\.<\/p>).(\.)/gi, '.</p><p>');
+
+    console.log(value);
 
     switch (true) {
       case userAgent.includes('chrome'):
-
-        value = value
-          .replace(/<br>/gi, '')
-          .replace(/<div>/gi, (match, $1) => {
-            
-          }
-          )
-          .replace(/<\/div>/gi, '');
-
         // console.log(value);
         setWriting(value);
         break;
       case userAgent.includes('firefox'):
-        setWriting(event.target.value);
+        setWriting(value);
         break;
       case userAgent.includes('msie'):
-        setWriting(event.target.value);
+        setWriting(value);
         break;
       default:
-        setWriting(event.target.value);
+        setWriting(value);
         break;
     }
   };
@@ -88,6 +97,9 @@ const WritePage = ({ user, firebase, match }) => {
           tagName="div"
           onChange={handleChange}
           onKeyDown={onKeyPress}
+          onClick={() => {
+            console.log('goo');
+          }}
         />
       </div>
     </div>
