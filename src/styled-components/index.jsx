@@ -21,7 +21,7 @@ export const ThemedHR = styled.hr(({ theme }) => {
 });
 
 export const PaddedContainer = styled(Container)({
-  padding: '2rem',
+  paddingTop: '3rem',
 });
 
 export const BorderedModal = styled(Modal)(({ theme }) => {

@@ -27,7 +27,10 @@ class Firebase {
   addWriting(userId) {
     return this.databaseRef(userId)
       .child('writings')
-      .push('Write here...').key;
+      .push({
+        topic: 'Untitled',
+        writing: 'Write here...',
+      }).key;
   }
 
   async getWritings(userId) {
@@ -41,7 +44,9 @@ class Firebase {
       value[child.key] = child.val();
     });
 
-    return value;
+    const topics = Object.entries(value).map(([k, v]) => ({ id: k, topic: v.topic }));
+
+    return topics;
   }
 
   async getWriting(userId, id) {

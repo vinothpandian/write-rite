@@ -28,33 +28,37 @@ const Navigation = ({
 
   return (
     <React.Fragment>
-      <Navbar variant={theme.className}>
+      <Navbar expand="sm" variant={theme.className}>
         <Navbar.Brand>
           Write-Rite
           {dashboard ? ' - Dashboard' : ''}
         </Navbar.Brand>
-        <Nav className="ml-auto">
-          {userSignedIn ? (
-            <UserSignedIn
-              dashboard={dashboard}
-              variant={textButtonVariant}
-              redirectToDashboard={redirectToDashboard}
-            />
-          ) : (
-            <UserSignedOut
-              variant={textButtonVariant}
-              showSignIn={() => setShowSignIn(true)}
-              showSignUp={() => setShowSignUp(true)}
-            />
-          )}
-          <Button variant={iconButtonVariant} onClick={toggleTheme}>
-            <img src={iconSrc} alt="Toggle" />
-          </Button>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="ml-auto">
+            {userSignedIn ? (
+              <UserSignedIn
+                dashboard={dashboard}
+                variant={textButtonVariant}
+                redirectToDashboard={redirectToDashboard}
+              />
+            ) : (
+              <UserSignedOut
+                variant={textButtonVariant}
+                showSignIn={() => setShowSignIn(true)}
+                showSignUp={() => setShowSignUp(true)}
+              />
+            )}
+            <Button variant={iconButtonVariant} onClick={toggleTheme}>
+              <img src={iconSrc} alt="Toggle" />
+            </Button>
 
-          <SignIn theme={theme} show={showSignIn} onHide={() => setShowSignIn(false)} />
-          <SignUp theme={theme} show={showSignUp} onHide={() => setShowSignUp(false)} />
-        </Nav>
+            <SignIn theme={theme} show={showSignIn} onHide={() => setShowSignIn(false)} />
+            <SignUp theme={theme} show={showSignUp} onHide={() => setShowSignUp(false)} />
+          </Nav>
+        </Navbar.Collapse>
       </Navbar>
+
       <ThemedHR theme={theme} />
     </React.Fragment>
   );
