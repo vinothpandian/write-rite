@@ -1,75 +1,29 @@
-import * as React from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import ReactRouterPropTypes from 'react-router-prop-types';
 
-import { Field, Formik } from 'formik';
-import { compose } from 'recompose';
-import { withRouter } from 'react-router';
-import { validateField as validate, validateEmail } from '../../utils';
-import Firebase, { withFirebase } from '../../contexts/Firebase';
-import { DASHBOARD } from '../../constants/routes';
+import Modal from 'react-bootstrap/Modal';
 
-const SignUp = (props) => {
-  const [errorMessage, setErrorMessage] = React.useState('');
+import SignUpForm from './SignUpForm';
 
-  return (
-    <Formik
-      initialValues={{ email: '', password: '', repeatPassword: '' }}
-      onSubmit={(values, { resetForm }) => {
-        const { firebase, history } = props;
+const SignUp = ({ show, onHide }) => (
+  <Modal
+    show={show}
+    onHide={onHide}
+    size="md"
+    aria-labelledby="contained-modal-title-vcenter"
+    centered
+  >
+    <Modal.Header closeButton>
+      <Modal.Title id="contained-modal-title-vcenter">Sign up</Modal.Title>
+    </Modal.Header>
 
-        firebase
-          .createUser(values)
-          .then(() => {
-            resetForm();
-            history.push(DASHBOARD);
-          })
-          .catch((error) => {
-            setErrorMessage(error.message);
-          });
-      }}
-      render={(formikProps) => {
-        const { touched, errors, handleSubmit } = formikProps;
-
-        return (
-          <form onSubmit={handleSubmit}>
-            <div>
-              <span>Email</span>
-              <Field type="email" validate={validateEmail} name="email" />
-              {touched.email && errors.email && <div>{errors.email}</div>}
-            </div>
-
-            <div>
-              <span>Password</span>
-              <Field type="password" validate={validate} name="password" />
-              {touched.password && errors.password && <div>{errors.password}</div>}
-            </div>
-
-            <div>
-              <span>Repeat password</span>
-              <Field type="password" validate={validate} name="repeatPassword" />
-              {touched.repeatPassword && errors.repeatPassword && (
-                <div>{errors.repeatPassword}</div>
-              )}
-            </div>
-
-            <div>{errorMessage}</div>
-            <div>
-              <button type="submit">Sign up</button>
-            </div>
-          </form>
-        );
-      }}
-    />
-  );
-};
+    <SignUpForm onHide={onHide} />
+  </Modal>
+);
 
 SignUp.propTypes = {
-  firebase: PropTypes.instanceOf(Firebase).isRequired,
-  history: ReactRouterPropTypes.history.isRequired,
+  onHide: PropTypes.func.isRequired,
+  show: PropTypes.bool.isRequired,
 };
 
-export default compose(
-  withRouter,
-  withFirebase,
-)(SignUp);
+export default SignUp;

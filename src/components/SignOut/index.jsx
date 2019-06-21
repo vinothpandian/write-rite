@@ -6,23 +6,29 @@ import { compose } from 'recompose';
 import { withRouter } from 'react-router';
 import Firebase, { withFirebase } from '../../contexts/Firebase';
 import { LANDING } from '../../constants/routes';
+import { StyledButton } from '../../styled-components';
 
-const SignOut = ({ firebase, history }) => {
+const SignOut = ({ firebase, history, variant }) => {
   const handleSignOut = () => {
     firebase.signOutUser();
     history.push(LANDING);
   };
 
   return (
-    <button type="button" onClick={handleSignOut}>
+    <StyledButton variant={variant} onClick={handleSignOut}>
       Sign out
-    </button>
+    </StyledButton>
   );
+};
+
+SignOut.defaultProps = {
+  variant: 'outline-light',
 };
 
 SignOut.propTypes = {
   firebase: PropTypes.instanceOf(Firebase).isRequired,
   history: ReactRouterPropTypes.history.isRequired,
+  variant: PropTypes.string,
 };
 
 export default compose(
