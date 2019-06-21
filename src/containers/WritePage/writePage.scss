@@ -1,7 +1,7 @@
-@import url('https://fonts.googleapis.com/css?family=Amiri&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Montserrat&display=swap');
 
 .wrapper1 {
-  height: 50vh;
+  height: 100vh;
   overflow-y: auto;
 }
 
@@ -13,22 +13,14 @@
 }
 
 .contentEditableContainer {
-  font-family: 'Amiri', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 1.2rem;
   outline: none;
   display: flex;
-  width: 100%;
+  width: 100vw;
   box-sizing: content-box;
   flex-direction: column;
   justify-content: flex-end;
-  padding-right: 17px;
+  margin: 2rem;
   overflow-y: scroll;
-
-  & div {
-    color: gray;
-  }
-
-  & div:last-child {
-    color: white;
-  }
 }

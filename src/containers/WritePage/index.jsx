@@ -79,7 +79,6 @@ const WritePage = ({ user, firebase, match }) => {
   // React.useEffect(() => {
   //   async function fetchAll() {
   //     if (user) {
-  //       console.log('Fetched...');
   //       const data = await firebase.getWriting(user, id);
   //       setWriting(data);
   //     }

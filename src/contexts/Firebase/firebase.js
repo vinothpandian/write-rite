@@ -54,7 +54,9 @@ class Firebase {
       .child(`writings/${id}`)
       .once('value');
 
-    return snapshot.val();
+    const value = snapshot.val();
+
+    return value.writing;
   }
 
   saveWriting(userId, id, writing) {
