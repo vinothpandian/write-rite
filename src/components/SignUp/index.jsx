@@ -4,9 +4,12 @@ import PropTypes from 'prop-types';
 import Modal from 'react-bootstrap/Modal';
 
 import SignUpForm from './SignUpForm';
+import { BorderedModal } from '../../styled-components';
+import customProps from '../../proptypes';
 
-const SignUp = ({ show, onHide }) => (
-  <Modal
+const SignUp = ({ theme, show, onHide }) => (
+  <BorderedModal
+    theme={theme}
     show={show}
     onHide={onHide}
     size="md"
@@ -18,12 +21,13 @@ const SignUp = ({ show, onHide }) => (
     </Modal.Header>
 
     <SignUpForm onHide={onHide} />
-  </Modal>
+  </BorderedModal>
 );
 
 SignUp.propTypes = {
   onHide: PropTypes.func.isRequired,
   show: PropTypes.bool.isRequired,
+  theme: customProps.theme.isRequired,
 };
 
 export default SignUp;

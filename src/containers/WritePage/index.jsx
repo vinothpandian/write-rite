@@ -92,6 +92,10 @@ const WritePage = ({ user, firebase, match }) => {
     <div className="wrapper1">
       <div className="wrapper2">
         <ContentEditable
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
           className="contentEditableContainer"
           html={writing}
           tagName="div"

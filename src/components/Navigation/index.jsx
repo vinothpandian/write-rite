@@ -51,8 +51,8 @@ const Navigation = ({
             <img src={iconSrc} alt="Toggle" />
           </Button>
 
-          <SignIn show={showSignIn} onHide={() => setShowSignIn(false)} />
-          <SignUp show={showSignUp} onHide={() => setShowSignUp(false)} />
+          <SignIn theme={theme} show={showSignIn} onHide={() => setShowSignIn(false)} />
+          <SignUp theme={theme} show={showSignUp} onHide={() => setShowSignUp(false)} />
         </Nav>
       </Navbar>
       <ThemedHR theme={theme} />
