@@ -2,18 +2,21 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import SignOut from '../SignOut';
-import { StyledButton } from '../../styled-components';
+import { ThemedButton } from '../../styled-components';
 
-const UserSignedIn = ({ variant, redirectToDashboard }) => (
+const UserSignedIn = ({ dashboard, variant, redirectToDashboard }) => (
   <React.Fragment>
-    <StyledButton variant={variant} onClick={redirectToDashboard}>
-      Dashboard
-    </StyledButton>
+    {!dashboard && (
+      <ThemedButton variant={variant} onClick={redirectToDashboard}>
+        Dashboard
+      </ThemedButton>
+    )}
     <SignOut variant={variant} />
   </React.Fragment>
 );
 
 UserSignedIn.propTypes = {
+  dashboard: PropTypes.bool.isRequired,
   variant: PropTypes.string.isRequired,
   redirectToDashboard: PropTypes.func.isRequired,
 };

@@ -11,7 +11,7 @@ import { withAuthUser } from '../../contexts/Session';
 import ThemeContext from '../../contexts/Theme';
 import Navigation from '../../components/Navigation';
 import { DASHBOARD } from '../../constants/routes';
-import { StyledJumbotron } from '../../styled-components';
+import { ThemedJumbotron } from '../../styled-components';
 
 const HomePage = ({ user, history }) => {
   const { theme, toggleTheme } = React.useContext(ThemeContext);
@@ -29,12 +29,12 @@ const HomePage = ({ user, history }) => {
         userSignedIn={!!user}
       />
 
-      <StyledJumbotron fluid>
+      <ThemedJumbotron fluid>
         <Container>
           <h1>Write-Rite!</h1>
           <p>Simplest writer ever!</p>
         </Container>
-      </StyledJumbotron>
+      </ThemedJumbotron>
     </div>
   );
 };

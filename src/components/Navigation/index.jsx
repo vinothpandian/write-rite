@@ -11,13 +11,13 @@ import SignUp from '../SignUp';
 
 import UserSignedIn from './UserSignedIn';
 import UserSignedOut from './UserSignedOut';
-import { StyledHR } from '../../styled-components';
+import { ThemedHR } from '../../styled-components';
 
 const lightIcon = require('../../assets/dark-light-light.svg');
 const darkIcon = require('../../assets/dark-light-dark.svg');
 
 const Navigation = ({
-  theme, toggleTheme, userSignedIn, redirectToDashboard,
+  dashboard, theme, toggleTheme, userSignedIn, redirectToDashboard,
 }) => {
   const [showSignIn, setShowSignIn] = React.useState(false);
   const [showSignUp, setShowSignUp] = React.useState(false);
@@ -29,9 +29,17 @@ const Navigation = ({
   return (
     <React.Fragment>
       <Navbar variant={theme.className}>
+        <Navbar.Brand>
+          Write-Rite
+          {dashboard ? ' - Dashboard' : ''}
+        </Navbar.Brand>
         <Nav className="ml-auto">
           {userSignedIn ? (
-            <UserSignedIn variant={textButtonVariant} redirectToDashboard={redirectToDashboard} />
+            <UserSignedIn
+              dashboard={dashboard}
+              variant={textButtonVariant}
+              redirectToDashboard={redirectToDashboard}
+            />
           ) : (
             <UserSignedOut
               variant={textButtonVariant}
@@ -47,16 +55,18 @@ const Navigation = ({
           <SignUp show={showSignUp} onHide={() => setShowSignUp(false)} />
         </Nav>
       </Navbar>
-      <StyledHR theme={theme} />
+      <ThemedHR theme={theme} />
     </React.Fragment>
   );
 };
 
 Navigation.defaultProps = {
+  dashboard: false,
   userSignedIn: false,
 };
 
 Navigation.propTypes = {
+  dashboard: PropTypes.bool,
   theme: customProps.theme.isRequired,
   toggleTheme: PropTypes.func.isRequired,
   userSignedIn: PropTypes.bool,

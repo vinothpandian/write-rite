@@ -3,13 +3,9 @@ import PropTypes from 'prop-types';
 
 import WritingItem from './WritingItem';
 
-const WritingList = ({ writings }) => (
-  <ol>
-    {Object.entries(writings).map(([id, writing]) => (
-      <WritingItem key={id} id={id} writing={writing} />
-    ))}
-  </ol>
-);
+const WritingList = ({ writings }) => Object.entries(writings).map(([id, writing]) => (
+  <WritingItem key={id} id={id} writing={writing} />
+));
 
 WritingList.propTypes = {
   writings: PropTypes.shape({

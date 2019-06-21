@@ -1,15 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { StyledButton } from '../../styled-components';
+import { ThemedButton } from '../../styled-components';
 
 const UserSignedOut = ({ variant, showSignIn, showSignUp }) => (
   <React.Fragment>
-    <StyledButton variant={variant} onClick={showSignIn}>
+    <ThemedButton variant={variant} onClick={showSignIn}>
       Sign in
-    </StyledButton>
-    <StyledButton variant={variant} onClick={showSignUp}>
+    </ThemedButton>
+    <ThemedButton variant={variant} onClick={showSignUp}>
       Sign up
-    </StyledButton>
+    </ThemedButton>
   </React.Fragment>
 );
 
