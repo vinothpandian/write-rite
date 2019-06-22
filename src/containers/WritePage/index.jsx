@@ -11,7 +11,7 @@ import './writePage.scss';
 
 const WritePage = ({ user, firebase, match }) => {
   const [writing, setWriting] = React.useState(
-    '<div>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.&nbsp; &nbsp;</div><div><br></div><div>Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.&nbsp; &nbsp;</div><div><br></div><div>Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.&nbsp; &nbsp;</div><div><br></div><div>This is a test. Yes it is. Oh yes. Sure sure. Cool.</div>',
+    '<div>Lorem ipsum dolor sit amet, <span id="focused-text" >consetetur sadipscing elitr,</span> sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.&nbsp; &nbsp;</div><div><br></div><div>Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.&nbsp; &nbsp;</div><div><br></div><div>Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.&nbsp; &nbsp;</div><div><br></div><div>This is a test. Yes it is. Oh yes. Sure sure. Cool.</div>',
   );
 
   const contentEditableRef = React.useRef(null);
@@ -45,7 +45,7 @@ const WritePage = ({ user, firebase, match }) => {
     const { anchorNode, anchorOffset } = selection;
     const { innerHTML } = anchorNode.parentElement;
 
-    const text = innerHTML.replace(/<em id="focused-text">/gi, '').replace(/\/em>gi/, '');
+    const text = innerHTML.replace(/<span id="focused-text">/gi, '').replace(/\/span>gi/, '');
 
     console.log(text);
 
@@ -55,7 +55,7 @@ const WritePage = ({ user, firebase, match }) => {
 
       const [begin, middle, end] = extractSentence(anchorOffset, indicies, text);
 
-      anchorNode.parentNode.innerHTML = `${begin}<em id="focused-text">${middle}</em>${end}`;
+      anchorNode.parentNode.innerHTML = `${begin}<span id="focused-text">${middle}</span>${end}`;
     }
   };
 
@@ -63,7 +63,7 @@ const WritePage = ({ user, firebase, match }) => {
     const userAgent = navigator.userAgent.toLowerCase();
     const { value } = event.target;
 
-    setFocus();
+    // setFocus();
 
     // value = value.replace(/<br>/gi, '');
 
@@ -126,7 +126,10 @@ const WritePage = ({ user, firebase, match }) => {
           onChange={handleChange}
           onKeyDown={onKeyPress}
           onClick={() => {
-            setFocus();
+            // setFocus();
+            const ce = contentEditableRef.current;
+            const elem = ce.querySelector('#focused-text');
+            elem.parentNode.removeChild(elem);
           }}
         />
       </div>
