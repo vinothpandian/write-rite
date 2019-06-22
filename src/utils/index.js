@@ -1,26 +1,26 @@
-export const validateEmail = (email) => {
-  let errorMessage;
-
-  if (!email) {
-    errorMessage = 'Required';
+export const matchAll = (regex, text) => {
+  const matches = [];
+  let match = null;
+  // eslint-disable-next-line no-cond-assign
+  while ((match = regex.exec(text)) !== null) {
+    matches.push(match.index);
   }
-
-  // eslint-disable-next-line
-  const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  const isEmail = re.test(String(email).toLowerCase());
-
-  if (!isEmail) {
-    errorMessage = 'Invalid email address';
-  }
-
-  return errorMessage;
+  return matches;
 };
 
-export const validateField = (value) => {
-  let errorMessage;
+export const extractSentence = (offset, indices, text) => {
+  const sortedIndices = indices.sort((a, b) => a - b);
 
-  if (!value) {
-    errorMessage = 'Required';
+  const textStart = sortedIndices[0];
+  const textEnd = sortedIndices[sortedIndices.length - 1];
+
+  let i = 0;
+  while (sortedIndices[i] < offset) {
+    i += 1;
   }
-  return errorMessage;
+
+  const start = sortedIndices[i - 1] || textStart;
+  const end = sortedIndices[i] || textEnd;
+
+  return [text.slice(textStart, start), text.slice(start, end), text.slice(end, textEnd)];
 };
