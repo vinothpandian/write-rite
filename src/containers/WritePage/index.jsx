@@ -37,42 +37,55 @@ const WritePage = ({ user, firebase, match }) => {
     parentNode.normalize();
   };
 
-  const setFocus = (onClick = true) => {
+  const setFocus = () => {
     const nodeRef = contentEditableRef.current;
 
     const currentHighlightedNode = nodeRef.querySelector('span#focused-text');
 
-    console.log(currentHighlightedNode);
-
-    if (currentHighlightedNode && onClick) {
+    if (currentHighlightedNode) {
       appendToParentAndRemove(currentHighlightedNode);
     }
 
     const selection = window.getSelection();
 
     const { anchorNode, anchorOffset } = selection;
+
+    if (anchorNode.parentElement === nodeRef) {
+      return;
+    }
+
     const { innerHTML: textContent } = anchorNode.parentElement;
 
-    if (anchorOffset > 0) {
-      const matches = matchAll(/\./gi, textContent);
-      const indicies = [0, ...matches, textContent.length];
+    const matches = matchAll(/\./gi, textContent);
+    const indicies = [0, ...matches, textContent.length];
 
-      const [begin, middle, end] = extractSentence(anchorOffset, indicies, textContent);
+    const {
+      begin, middle, end, newCaretPosition,
+    } = extractSentence(
+      anchorOffset,
+      indicies,
+      textContent,
+    );
 
-      const spacelessEnd = end.replace(/&nbsp;/gi, '');
+    const spacelessEnd = end.replace(/&nbsp;/gi, '');
 
-      // Create new node
-      const focusedNode = document.createElement('span');
-      const focusedText = document.createTextNode(middle);
+    // Create new node
+    const focusedNode = document.createElement('span');
+    focusedNode.innerHTML = middle || ' ';
 
-      focusedNode.id = 'focused-text';
-      focusedNode.appendChild(focusedText);
+    focusedNode.id = 'focused-text';
 
-      const newNode = document.createElement('div');
-      newNode.append(begin, focusedNode, spacelessEnd);
+    const newNode = document.createElement('div');
+    newNode.append(begin, focusedNode, spacelessEnd);
 
-      nodeRef.replaceChild(newNode, anchorNode.parentElement);
-    }
+    nodeRef.replaceChild(newNode, anchorNode.parentElement);
+
+    const range = document.createRange();
+
+    range.setStart(focusedNode.firstChild, newCaretPosition);
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
   };
 
   const handleChange = (event) => {
@@ -105,8 +118,10 @@ const WritePage = ({ user, firebase, match }) => {
           tagName="div"
           onChange={handleChange}
           onKeyDown={onKeyPress}
-          onClick={() => {
-            setFocus();
+          onClick={(event) => {
+            if (event.target.id !== 'focused-text') {
+              setFocus();
+            }
           }}
         />
       </div>

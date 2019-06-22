@@ -3,7 +3,7 @@ export const matchAll = (regex, text) => {
   let match = null;
   // eslint-disable-next-line no-cond-assign
   while ((match = regex.exec(text)) !== null) {
-    matches.push(match.index);
+    matches.push(match.index + 1);
   }
   return matches;
 };
@@ -19,11 +19,13 @@ export const extractSentence = (offset, indices, text) => {
     i += 1;
   }
 
-  let start = sortedIndices[i - 1] || textStart;
-  let end = sortedIndices[i] || textEnd;
+  const start = sortedIndices[i - 1] || textStart;
+  const end = sortedIndices[i] || textEnd;
 
-  start = start === 0 ? start : start + 1;
-  end = end > textEnd ? end : end + 1;
-
-  return [text.slice(textStart, start), text.slice(start, end), text.slice(end)];
+  return {
+    begin: text.slice(textStart, start),
+    middle: text.slice(start, end),
+    end: text.slice(end),
+    newCaretPosition: offset - start,
+  };
 };
