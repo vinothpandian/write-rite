@@ -15,12 +15,15 @@ export const extractSentence = (offset, indices, text) => {
   const textEnd = sortedIndices[sortedIndices.length - 1];
 
   let i = 0;
-  while (sortedIndices[i] < offset) {
+  while (sortedIndices[i] <= offset) {
     i += 1;
   }
 
-  const start = sortedIndices[i - 1] || textStart;
-  const end = sortedIndices[i] || textEnd;
+  let start = sortedIndices[i - 1] || textStart;
+  let end = sortedIndices[i] || textEnd;
 
-  return [text.slice(textStart, start), text.slice(start, end), text.slice(end, textEnd)];
+  start = start === 0 ? start : start + 1;
+  end = end > textEnd ? end : end + 1;
+
+  return [text.slice(textStart, start), text.slice(start, end), text.slice(end)];
 };

@@ -18,16 +18,6 @@ const WritePage = ({ user, firebase, match }) => {
 
   const { id } = match.params;
 
-  /* $(document).on('click', '#myButton', function () {
-    if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1)
-      var str = $('#myDiv').html().replace(/<br>/gi, '').replace(/<div>/gi, '<br>').replace(/<\/div>/gi, '');
-    else if (navigator.userAgent.toLowerCase().indexOf("firefox") > -1)
-      var str = $('#myDiv').html().replace(/<\/br>/gi, '').replace(/<br>/gi, '<br>').replace(/<\/br>/gi, '');
-    else if (navigator.userAgent.toLowerCase().indexOf("msie") == -1)
-      var str = $('#myDiv').html().replace(/<br>/gi, '').replace(/<p>/gi, '<br>').replace(/<\/p>/gi, '');
-    $('#myDiv2').removeClass('invisible').addClass('visible').text(str);
-    $('#myDiv3').removeClass('invisible').addClass('visible').html(str); */
-
   const onKeyPress = (event) => {
     if (
       (window.navigator.platform.match('Mac') ? event.metaKey : event.ctrlKey)
@@ -39,65 +29,55 @@ const WritePage = ({ user, firebase, match }) => {
     }
   };
 
-  const setFocus = () => {
+  const appendToParentAndRemove = (currentHighlightedNode) => {
+    const { parentNode } = currentHighlightedNode;
+
+    parentNode.insertBefore(currentHighlightedNode.firstChild, currentHighlightedNode);
+    parentNode.removeChild(currentHighlightedNode);
+    parentNode.normalize();
+  };
+
+  const setFocus = (onClick = true) => {
+    const nodeRef = contentEditableRef.current;
+
+    const currentHighlightedNode = nodeRef.querySelector('span#focused-text');
+
+    console.log(currentHighlightedNode);
+
+    if (currentHighlightedNode && onClick) {
+      appendToParentAndRemove(currentHighlightedNode);
+    }
+
     const selection = window.getSelection();
 
     const { anchorNode, anchorOffset } = selection;
-    const { innerHTML } = anchorNode.parentElement;
-
-    const text = innerHTML.replace(/<span id="focused-text">/gi, '').replace(/\/span>gi/, '');
-
-    console.log(text);
+    const { innerHTML: textContent } = anchorNode.parentElement;
 
     if (anchorOffset > 0) {
-      const matches = matchAll(/\./gi, text);
-      const indicies = [0, ...matches, text.length];
+      const matches = matchAll(/\./gi, textContent);
+      const indicies = [0, ...matches, textContent.length];
 
-      const [begin, middle, end] = extractSentence(anchorOffset, indicies, text);
+      const [begin, middle, end] = extractSentence(anchorOffset, indicies, textContent);
 
-      anchorNode.parentNode.innerHTML = `${begin}<span id="focused-text">${middle}</span>${end}`;
+      const spacelessEnd = end.replace(/&nbsp;/gi, '');
+
+      // Create new node
+      const focusedNode = document.createElement('span');
+      const focusedText = document.createTextNode(middle);
+
+      focusedNode.id = 'focused-text';
+      focusedNode.appendChild(focusedText);
+
+      const newNode = document.createElement('div');
+      newNode.append(begin, focusedNode, spacelessEnd);
+
+      nodeRef.replaceChild(newNode, anchorNode.parentElement);
     }
   };
 
   const handleChange = (event) => {
-    const userAgent = navigator.userAgent.toLowerCase();
     const { value } = event.target;
-
-    // setFocus();
-
-    // value = value.replace(/<br>/gi, '');
-
-    // const parser = new DOMParser();
-    // const doc = parser.parseFromString(value, 'text/html');
-    // const divs = doc.querySelectorAll('div');
-
-    // const lastDiv = divs[divs.length - 1];
-    // const { innerHTML } = lastDiv;
-
-    // lastDiv.innerHTML = `booyea ${innerHTML}`;
-
-    // value = value
-    //   .replace(/<div>/gi, '')
-    //   .replace(/<\/div>/gi, '')
-    //   .replace(/<br>/gi, '<div><br/></div>');
-
-    // console.log(value);
-
-    switch (true) {
-      case userAgent.includes('chrome'):
-        // console.log(value);
-        setWriting(value);
-        break;
-      case userAgent.includes('firefox'):
-        setWriting(value);
-        break;
-      case userAgent.includes('msie'):
-        setWriting(value);
-        break;
-      default:
-        setWriting(value);
-        break;
-    }
+    setWriting(value);
   };
 
   // React.useEffect(() => {
@@ -126,10 +106,7 @@ const WritePage = ({ user, firebase, match }) => {
           onChange={handleChange}
           onKeyDown={onKeyPress}
           onClick={() => {
-            // setFocus();
-            const ce = contentEditableRef.current;
-            const elem = ce.querySelector('#focused-text');
-            elem.parentNode.removeChild(elem);
+            setFocus();
           }}
         />
       </div>
