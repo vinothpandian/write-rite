@@ -32,33 +32,42 @@ const WritePage = ({ user, firebase, match }) => {
   const appendToParentAndRemove = (currentHighlightedNode) => {
     const { parentNode } = currentHighlightedNode;
 
-    parentNode.insertBefore(currentHighlightedNode.firstChild, currentHighlightedNode);
+    // copy content to parent if focused node has text
+    if (currentHighlightedNode.firstChild) {
+      parentNode.insertBefore(currentHighlightedNode.firstChild, currentHighlightedNode);
+    }
+
     parentNode.removeChild(currentHighlightedNode);
     parentNode.normalize();
   };
 
   const setFocus = () => {
+    // Get contenteditable node
     const nodeRef = contentEditableRef.current;
 
+    // Get Node with focused text
     const currentHighlightedNode = nodeRef.querySelector('span#focused-text');
 
+    // If focused text exist then move it's text to parent and remove it
     if (currentHighlightedNode) {
       appendToParentAndRemove(currentHighlightedNode);
     }
 
+    // Get the current cursor position and it's parent
     const selection = window.getSelection();
-
     const { anchorNode, anchorOffset } = selection;
 
+    // if cursor's parent is contenteditable node then do nothing
     if (anchorNode.parentElement === nodeRef) {
       return;
     }
 
+    // Get the innerHTML of cursor's parent and identify all "."
     const { innerHTML: textContent } = anchorNode.parentElement;
-
     const matches = matchAll(/\./gi, textContent);
     const indicies = [0, ...matches, textContent.length];
 
+    // Split the text to currentline with cursor postion, before it and after it
     const {
       begin, middle, end, newCaretPosition,
     } = extractSentence(
@@ -67,21 +76,24 @@ const WritePage = ({ user, firebase, match }) => {
       textContent,
     );
 
+    // Edge case: remove text with &nbsp; and add space instead
     const spacelessEnd = end.replace(/&nbsp;/gi, '');
 
-    // Create new node
+    // Create new focused node and fill it's innerHTML and id
     const focusedNode = document.createElement('span');
     focusedNode.innerHTML = middle || ' ';
-
     focusedNode.id = 'focused-text';
 
+    // Create a new div to add text
     const newNode = document.createElement('div');
     newNode.append(begin, focusedNode, spacelessEnd);
+    newNode.normalize();
 
+    // Replace the cursor's parent with newly created node
     nodeRef.replaceChild(newNode, anchorNode.parentElement);
 
+    // Reset the cursor position to the click position
     const range = document.createRange();
-
     range.setStart(focusedNode.firstChild, newCaretPosition);
     range.collapse(true);
     selection.removeAllRanges();
