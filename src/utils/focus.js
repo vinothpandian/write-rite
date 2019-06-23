@@ -19,14 +19,33 @@ const extractSentence = (offset, indices, text) => {
     i += 1;
   }
 
-  const start = sortedIndices[i - 1] || textStart;
-  const end = sortedIndices[i] || textEnd;
+  const startIndex = sortedIndices[i - 1] || textStart;
+  const endIndex = sortedIndices[i] || textEnd;
+
+  const begin = text.slice(textStart, startIndex);
+  let middle = text.slice(startIndex, endIndex);
+  const end = text.slice(endIndex);
+
+  const newCaretPosition = offset - startIndex;
+
+  if (!middle) {
+    if (begin[begin.length - 1] === '.') {
+      middle = ' ';
+    } else {
+      const newExtractedData = extractSentence(offset - 1, indices, text);
+
+      return {
+        ...newExtractedData,
+        newCaretPosition: newExtractedData.newCaretPosition + 1,
+      };
+    }
+  }
 
   return {
-    begin: text.slice(textStart, start),
-    middle: text.slice(start, end),
-    end: text.slice(end),
-    newCaretPosition: offset - start,
+    begin,
+    middle,
+    end,
+    newCaretPosition,
   };
 };
 
@@ -44,8 +63,16 @@ const appendToParentAndRemove = (currentHighlightedNode) => {
 
 const setCaretPosition = (selection, node, position) => {
   // Reset the cursor position to the click position
+
+  let caretPosition = position;
+
   const range = document.createRange();
-  range.setStart(node.firstChild, position);
+
+  if (node.firstChild.length < position) {
+    caretPosition = node.firstChild.length;
+  }
+
+  range.setStart(node.firstChild, caretPosition);
   range.collapse(true);
   selection.removeAllRanges();
   selection.addRange(range);
@@ -67,7 +94,7 @@ const createFocusedNode = (cursorOffset, cursorParent) => {
 
   // Create new focused node and fill it's innerHTML and id
   const focusedNode = document.createElement('span');
-  focusedNode.innerHTML = middle || ' ';
+  focusedNode.innerHTML = middle;
   focusedNode.id = 'focused-text';
 
   // Create a new div to add text
@@ -88,32 +115,66 @@ const findAndProcessFocusedNode = (contentEditableNode) => {
   }
 };
 
+function getCaretPosition() {
+  if (window.getSelection && window.getSelection().getRangeAt) {
+    const range = window.getSelection().getRangeAt(0);
+    const selectedObj = window.getSelection();
+    let rangeCount = 0;
+    const { parentNode } = selectedObj.anchorNode;
+    const { childNodes } = parentNode;
+
+    for (let i = 0; i < childNodes.length; i += 1) {
+      if (childNodes[i] === selectedObj.anchorNode) {
+        break;
+      }
+      if (childNodes[i].outerHTML) rangeCount += childNodes[i].outerHTML.length;
+      else if (childNodes[i].nodeType === 3) {
+        rangeCount += childNodes[i].textContent.length;
+      }
+    }
+    return {
+      caretOffset: range.startOffset + rangeCount,
+      caretNode: parentNode,
+    };
+  }
+  return {
+    caretOffset: -1,
+    caretNode: null,
+  };
+}
+
 const setFocusOnClick = (ref) => {
   // Get contenteditable node
   const contentEditableNode = ref.current;
-
-  findAndProcessFocusedNode(contentEditableNode);
-
   // Get the current cursor position and it's parent
   const selection = window.getSelection();
-  const { anchorNode, anchorOffset } = selection;
-  const { parentElement } = anchorNode;
+
+  const { caretOffset, caretNode } = getCaretPosition();
+
+  console.log(caretOffset, caretNode);
 
   // if cursor's parent is contenteditable node then do nothing
-  if (parentElement === contentEditableNode) {
+  if (caretNode === contentEditableNode || caretNode.id === 'focused-text') {
     return;
   }
 
-  const { node, focusedNode, newCaretPosition } = createFocusedNode(anchorOffset, parentElement);
+  findAndProcessFocusedNode(contentEditableNode);
+
+  const { node, focusedNode, newCaretPosition } = createFocusedNode(caretOffset, caretNode);
 
   // Replace the cursor's parent with newly created node
-  contentEditableNode.replaceChild(node, parentElement);
+  contentEditableNode.replaceChild(node, caretNode);
 
   setCaretPosition(selection, focusedNode, newCaretPosition);
 };
 
 const setFocusOnInput = (ref) => {
-  console.log('handle input focus');
+  const contentEditableNode = ref.current;
+
+  const selection = window.getSelection();
+
+  const { anchorNode, anchorOffset } = selection;
+  const { parentElement } = anchorNode;
 };
 
 const setFocus = (eventType, ref) => {
@@ -125,7 +186,8 @@ const setFocus = (eventType, ref) => {
       setFocusOnInput(ref);
       break;
     default:
-      console.log('New event === write new function');
+      // eslint-disable-next-line no-console
+      console.info('New event === write new function');
       break;
   }
 };
