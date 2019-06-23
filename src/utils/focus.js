@@ -1,3 +1,30 @@
+import dompurify from 'dompurify';
+
+function getCaretCharacterOffsetWithin(element) {
+  let caretOffset = 0;
+  const doc = element.ownerDocument || element.document;
+  const win = doc.defaultView || doc.parentWindow;
+  let sel;
+  if (typeof win.getSelection !== 'undefined') {
+    sel = win.getSelection();
+    if (sel.rangeCount > 0) {
+      const range = win.getSelection().getRangeAt(0);
+      const preCaretRange = range.cloneRange();
+      preCaretRange.selectNodeContents(element);
+      preCaretRange.setEnd(range.endContainer, range.endOffset);
+      caretOffset = preCaretRange.toString().length;
+    }
+    // eslint-disable-next-line
+  } else if ((sel = doc.selection) && sel.type != 'Control') {
+    const textRange = sel.createRange();
+    const preCaretTextRange = doc.body.createTextRange();
+    preCaretTextRange.moveToElementText(element);
+    preCaretTextRange.setEndPoint('EndToEnd', textRange);
+    caretOffset = preCaretTextRange.text.length;
+  }
+  return caretOffset;
+}
+
 export const matchAll = (regex, text) => {
   const matches = [];
   let match = null;
@@ -80,21 +107,28 @@ const setCaretPosition = (selection, node, position) => {
 
 const createFocusedNode = (cursorOffset, cursorParent) => {
   // Get the innerHTML of cursor's parent and identify all "."
-  const { innerHTML } = cursorParent;
-  const matches = matchAll(/\./gi, innerHTML);
-  const indices = [0, ...matches, innerHTML.length];
+  const { textContent: innerHTML } = cursorParent;
+
+  const purifiedHTML = dompurify.sanitize(innerHTML);
+
+  const matches = matchAll(/\./gi, purifiedHTML);
+  const indices = [0, ...matches, purifiedHTML.length];
 
   // Split the text to currentline with cursor postion, before it and after it
-  const { newCaretPosition, ...innerHTMLSplit } = extractSentence(cursorOffset, indices, innerHTML);
+  const { newCaretPosition, ...purifiedHTMLSplit } = extractSentence(
+    cursorOffset,
+    indices,
+    purifiedHTML,
+  );
 
-  const { begin, middle, end } = innerHTMLSplit;
+  const { begin, middle, end } = purifiedHTMLSplit;
 
   // Edge case: remove text with &nbsp; and add space instead
   const spacelessEnd = end.replace(/&nbsp;/gi, '');
 
   // Create new focused node and fill it's innerHTML and id
   const focusedNode = document.createElement('span');
-  focusedNode.innerHTML = middle;
+  focusedNode.textContent = middle;
   focusedNode.id = 'focused-text';
 
   // Create a new div to add text
@@ -108,8 +142,6 @@ const createFocusedNode = (cursorOffset, cursorParent) => {
 const findAndProcessFocusedNode = (contentEditableNode) => {
   // Get Node with focused text
   const focusedNodes = contentEditableNode.querySelectorAll('span#focused-text');
-
-  console.log(focusedNodes);
 
   // If focused text exist then move it's text to parent and remove it
   focusedNodes.forEach((node) => {
@@ -169,38 +201,88 @@ export const setFocusOnClick = (ref) => {
 };
 
 export const setFocusOnInput = (ref, value, callback) => {
-  // const selection = window.getSelection();
-
-  // const { anchorNode, anchorOffset } = selection;
-  // const { parentElement } = anchorNode;
-
   const contentEditableNode = ref.current;
-  // Get the current cursor position and it's parent
 
-  const { caretNode } = getCaretPosition();
+  const { caretOffset, caretNode } = getCaretPosition();
 
-  const focusedNodes = contentEditableNode.querySelectorAll('span#focused-text');
+  if (caretNode.id === 'focused-text') {
+    callback(dompurify.sanitize(value));
+  } else {
+    // eslint-disable-next-line
+    const domParser = new DOMParser();
+    const doc = domParser.parseFromString(value, 'text/html');
+    const { body } = doc;
 
-  // If focused text exist then move it's text to parent and remove it
-  focusedNodes.forEach((node) => {
-    const { parentNode } = node;
+    const caretPosition = getCaretCharacterOffsetWithin(contentEditableNode);
 
-    // copy content to parent if focused node has text
-    if (node.firstChild) {
-      parentNode.insertBefore(node.firstChild, node);
-    }
+    body.childNodes.forEach((node) => {
+      if (node.isEqualNode(caretNode)) {
+        console.log('Coolsies');
+      }
+    });
 
-    parentNode.removeChild(node);
-    parentNode.normalize();
-  });
+    const focusedNodes = body.querySelectorAll('#focused-text');
 
-  let nextValue = contentEditableNode.innerHTML;
-  const matches = matchAll(/\./gi, nextValue);
+    // If focused text exist then move it's text to parent and remove it
+    focusedNodes.forEach((node) => {
+      const { parentNode } = node;
 
-  const end = matches.reverse()[0];
+      // copy content to parent if focused node has text
+      if (node.firstChild) {
+        parentNode.insertBefore(node.firstChild, node);
+      }
 
-  const focusedText = nextValue.slice(end).replace(/<\/div>/gi, '');
-  nextValue = `${nextValue.slice(0, end)}<span id="focused-text">${focusedText}</span></div>`;
+      parentNode.removeChild(node);
+      parentNode.normalize();
+    });
 
-  callback(nextValue);
+    // const { innerHTML } = contentEditableNode;
+
+    // const purifiedHTML = dompurify.sanitize(innerHTML);
+
+    // const matches = matchAll(/\./gi, purifiedHTML);
+    // const indices = [0, ...matches, purifiedHTML.length];
+
+    // // Split the text to currentline with cursor postion, before it and after it
+    // const { newCaretPosition, ...purifiedHTMLSplit } = extractSentence(
+    //   caretPosition,
+    //   indices,
+    //   purifiedHTML,
+    // );
+
+    // const { begin, middle, end } = purifiedHTMLSplit;
+
+    // // Edge case: remove text with &nbsp; and add space instead
+    // const spacelessEnd = end.replace(/&nbsp;/gi, '');
+
+    // // Create new focused node and fill it's innerHTML and id
+    // const focusedNode = document.createElement('span');
+    // focusedNode.textContent = middle;
+    // focusedNode.id = 'focused-text';
+
+    // // Create a new div to add text
+    // const node = document.createElement('div');
+    // node.append(begin, focusedNode, spacelessEnd);
+    // node.normalize();
+
+    // console.log(node);
+
+    // Replace the cursor's parent with newly created node
+    // body.replaceChild(node, caretNode);
+
+    callback(dompurify.sanitize(contentEditableNode.innerHTML));
+  }
+
+  // let nextValue = dompurify.sanitize(value);
+
+  // const matches = matchAll(/\./gi, nextValue);
+
+  // const end = matches.reverse()[0];
+
+  // console.log(matches, end);
+
+  // if (end) {
+  //   const focusedText = nextValue.slice(end).replace(/<\/div>/gi, '');
+  //   nextValue = `${nextValue.slice(0, end)}<span id="focused-text">${focusedText}</span></div>`;
+  // }
 };
