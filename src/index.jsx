@@ -4,6 +4,7 @@ import './index.scss';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { FirebaseProvider } from './contexts/Firebase';
+import 'draft-js/dist/Draft.css';
 
 ReactDOM.render(
   <FirebaseProvider>

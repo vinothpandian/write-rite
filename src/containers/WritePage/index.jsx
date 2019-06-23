@@ -1,110 +1,83 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import ReactRouterPropTypes from 'react-router-prop-types';
+import {
+  Editor,
+  EditorState,
+  ContentState,
+  Modifier,
+  DefaultDraftBlockRenderMap,
+  RichUtils,
+} from 'draft-js';
+
+import Immutable from 'immutable';
+// import 'draft-js/dist/Draft.css';
 
 import { compose } from 'recompose';
-import ContentEditable from 'react-contenteditable';
+
 import { withAuthorization, withAuthUser } from '../../contexts/Session';
 import Firebase, { withFirebase } from '../../contexts/Firebase';
 import './writePage.scss';
 
+const FocusedText = ({ children }) => (
+  <div style={{ color: 'red' }} id="focused-text">
+    {children}
+  </div>
+);
+
 const WritePage = ({ user, firebase, match }) => {
   const [writing, setWriting] = React.useState(
-    '<div>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.&nbsp; &nbsp;</div><div><br></div><div>Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.&nbsp; &nbsp;</div><div><br></div><div>Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.&nbsp; &nbsp;</div><div><br></div><div>Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.&nbsp; &nbsp;</div><div><br></div><div>Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis.&nbsp; &nbsp;</div><div><br></div><div>At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.&nbsp; &nbsp;</div><div><br></div><div>Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus.&nbsp; &nbsp;</div><div><br></div><div>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.&nbsp; &nbsp;</div><div><br></div><div>Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.&nbsp; &nbsp;</div><div><br></div><div>Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.&nbsp; &nbsp;</div><div><br></div><div>Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo</div>',
+    EditorState.createWithContent(
+      ContentState.createFromText(
+        'Hello World!. \n \n This is vinoth. How are you?! Hello World!. This is vinoth. How are you?! Hello World!. This is vinoth. How are you?! Hello World!. This is vinoth. How are you?! Hello World!. This is vinoth. How are you?!',
+      ),
+    ),
   );
 
-  const { id } = match.params;
+  const blockRenderMap = Immutable.Map({
+    FocusedText: {
+      element: 'div',
+      wrapper: <FocusedText />,
+    },
+  });
 
-  /* $(document).on('click', '#myButton', function () {
-    if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1)
-      var str = $('#myDiv').html().replace(/<br>/gi, '').replace(/<div>/gi, '<br>').replace(/<\/div>/gi, '');
-    else if (navigator.userAgent.toLowerCase().indexOf("firefox") > -1)
-      var str = $('#myDiv').html().replace(/<\/br>/gi, '').replace(/<br>/gi, '<br>').replace(/<\/br>/gi, '');
-    else if (navigator.userAgent.toLowerCase().indexOf("msie") == -1)
-      var str = $('#myDiv').html().replace(/<br>/gi, '').replace(/<p>/gi, '<br>').replace(/<\/p>/gi, '');
-    $('#myDiv2').removeClass('invisible').addClass('visible').text(str);
-    $('#myDiv3').removeClass('invisible').addClass('visible').html(str); */
+  // Include 'paragraph' as a valid block and updated the unstyled element but
+  // keep support for other draft default block types
+  const extendedBlockRenderMap = DefaultDraftBlockRenderMap.merge(blockRenderMap);
 
-  const onKeyPress = (event) => {
-    if (
-      (window.navigator.platform.match('Mac') ? event.metaKey : event.ctrlKey)
-      && event.keyCode === 83
-    ) {
-      event.preventDefault();
-
-      firebase.saveWriting(user, id, writing);
-    }
+  const styleMap = {
+    focusText: {
+      background: 'red',
+    },
   };
-
-  const handleChange = (event) => {
-    const userAgent = navigator.userAgent.toLowerCase();
-    let { value } = event.target;
-
-    // value = value.replace(/<br>/gi, '');
-
-    // const parser = new DOMParser();
-    // const doc = parser.parseFromString(value, 'text/html');
-    // const divs = doc.querySelectorAll('div');
-
-    // const lastDiv = divs[divs.length - 1];
-    // const { innerHTML } = lastDiv;
-
-    // lastDiv.innerHTML = `booyea ${innerHTML}`;
-
-    value = value
-      .replace(/<div>/gi, '')
-      .replace(/<\/div>/gi, '')
-      .replace(/<br>/gi, '<div><br/></div>');
-    value = value.replace(/^(\.<\/p>).(\.)/gi, '.</p><p>');
-
-    console.log(value);
-
-    switch (true) {
-      case userAgent.includes('chrome'):
-        // console.log(value);
-        setWriting(value);
-        break;
-      case userAgent.includes('firefox'):
-        setWriting(value);
-        break;
-      case userAgent.includes('msie'):
-        setWriting(value);
-        break;
-      default:
-        setWriting(value);
-        break;
-    }
-  };
-
-  // React.useEffect(() => {
-  //   async function fetchAll() {
-  //     if (user) {
-  //       const data = await firebase.getWriting(user, id);
-  //       setWriting(data);
-  //     }
-  //   }
-
-  //   fetchAll();
-  // }, [user, firebase, id]);
 
   return (
     <div className="wrapper1">
-      <div className="wrapper2">
-        <ContentEditable
-          autoComplete="off"
-          autoCorrect="off"
-          autoCapitalize="off"
-          spellCheck="false"
-          className="contentEditableContainer"
-          html={writing}
-          tagName="div"
-          onChange={handleChange}
-          onKeyDown={onKeyPress}
-          onClick={() => {
-            console.log('goo');
-          }}
-        />
-      </div>
+      <Editor
+        placeholder="Write here.."
+        editorState={writing}
+        customStyleMap={styleMap}
+        onChange={(editorState) => {
+          const currentContent = editorState.getCurrentContent();
+          const selection = editorState.getSelection();
+
+          const updatedContentState = Modifier.applyInlineStyle(
+            currentContent,
+            selection,
+            'focusText',
+          );
+
+          const nextEditorState = EditorState.push(
+            editorState,
+            updatedContentState,
+            'change-inline-style',
+          );
+
+          setWriting(nextEditorState);
+
+          console.log(editorState.getCurrentInlineStyle().toJS());
+        }}
+      />
     </div>
   );
 };

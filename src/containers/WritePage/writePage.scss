@@ -1,26 +1,20 @@
 @import url('https://fonts.googleapis.com/css?family=Montserrat&display=swap');
 
-.wrapper1 {
-  height: 100vh;
-  overflow-y: auto;
+.DraftEditor-root {
+  overflow-x: hidden;
+  margin: 2rem;
 }
 
-.wrapper2 {
-  min-height: 100%;
-  display: flex;
-  overflow: hidden;
-  //   position: relative;
-}
-
-.contentEditableContainer {
+.DraftEditor-editorContainer {
   font-family: 'Montserrat', sans-serif;
   font-size: 1.2rem;
-  outline: none;
-  display: flex;
-  width: 100vw;
-  box-sizing: content-box;
-  flex-direction: column;
-  justify-content: flex-end;
-  margin: 2rem;
-  overflow-y: scroll;
+  width: 100%;
+  padding: 2rem;
+}
+
+.superFancyBlockquote {
+  color: #999;
+  font-family: 'Hoefler Text', Georgia, serif;
+  font-style: italic;
+  text-align: center;
 }
