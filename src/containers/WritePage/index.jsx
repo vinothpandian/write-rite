@@ -6,7 +6,7 @@ import { compose } from 'recompose';
 import ContentEditable from 'react-contenteditable';
 import { withAuthorization, withAuthUser } from '../../contexts/Session';
 import Firebase, { withFirebase } from '../../contexts/Firebase';
-import { setFocus } from '../../utils';
+import { setFocusOnClick, setFocusOnInput } from '../../utils';
 import './writePage.scss';
 
 const WritePage = ({ user, firebase, match }) => {
@@ -32,9 +32,7 @@ const WritePage = ({ user, firebase, match }) => {
   const handleChange = (event) => {
     const { value } = event.target;
 
-    setFocus(event.type, contentEditableRef);
-
-    setWriting(value);
+    setFocusOnInput(contentEditableRef, value, setWriting);
   };
 
   // React.useEffect(() => {
@@ -64,7 +62,7 @@ const WritePage = ({ user, firebase, match }) => {
           onKeyDown={onKeyPress}
           onClick={(event) => {
             if (event.target.id !== 'focused-text') {
-              setFocus(event.type, contentEditableRef);
+              setFocusOnClick(contentEditableRef);
             }
           }}
         />

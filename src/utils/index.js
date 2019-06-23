@@ -1,5 +1,5 @@
-import setFocus from './focus';
+import { matchAll, setFocusOnClick, setFocusOnInput } from './focus';
 
-export { setFocus };
+export { setFocusOnClick, setFocusOnInput, matchAll };
 
-export default setFocus;
+export default setFocusOnClick;

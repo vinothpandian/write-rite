@@ -1,4 +1,4 @@
-const matchAll = (regex, text) => {
+export const matchAll = (regex, text) => {
   const matches = [];
   let match = null;
   // eslint-disable-next-line no-cond-assign
@@ -107,12 +107,14 @@ const createFocusedNode = (cursorOffset, cursorParent) => {
 
 const findAndProcessFocusedNode = (contentEditableNode) => {
   // Get Node with focused text
-  const currentHighlightedNode = contentEditableNode.querySelector('span#focused-text');
+  const focusedNodes = contentEditableNode.querySelectorAll('span#focused-text');
+
+  console.log(focusedNodes);
 
   // If focused text exist then move it's text to parent and remove it
-  if (currentHighlightedNode) {
-    appendToParentAndRemove(currentHighlightedNode);
-  }
+  focusedNodes.forEach((node) => {
+    appendToParentAndRemove(node);
+  });
 };
 
 function getCaretPosition() {
@@ -143,15 +145,13 @@ function getCaretPosition() {
   };
 }
 
-const setFocusOnClick = (ref) => {
+export const setFocusOnClick = (ref) => {
   // Get contenteditable node
   const contentEditableNode = ref.current;
   // Get the current cursor position and it's parent
   const selection = window.getSelection();
 
   const { caretOffset, caretNode } = getCaretPosition();
-
-  console.log(caretOffset, caretNode);
 
   // if cursor's parent is contenteditable node then do nothing
   if (caretNode === contentEditableNode || caretNode.id === 'focused-text') {
@@ -168,28 +168,39 @@ const setFocusOnClick = (ref) => {
   setCaretPosition(selection, focusedNode, newCaretPosition);
 };
 
-const setFocusOnInput = (ref) => {
+export const setFocusOnInput = (ref, value, callback) => {
+  // const selection = window.getSelection();
+
+  // const { anchorNode, anchorOffset } = selection;
+  // const { parentElement } = anchorNode;
+
   const contentEditableNode = ref.current;
+  // Get the current cursor position and it's parent
 
-  const selection = window.getSelection();
+  const { caretNode } = getCaretPosition();
 
-  const { anchorNode, anchorOffset } = selection;
-  const { parentElement } = anchorNode;
+  const focusedNodes = contentEditableNode.querySelectorAll('span#focused-text');
+
+  // If focused text exist then move it's text to parent and remove it
+  focusedNodes.forEach((node) => {
+    const { parentNode } = node;
+
+    // copy content to parent if focused node has text
+    if (node.firstChild) {
+      parentNode.insertBefore(node.firstChild, node);
+    }
+
+    parentNode.removeChild(node);
+    parentNode.normalize();
+  });
+
+  let nextValue = contentEditableNode.innerHTML;
+  const matches = matchAll(/\./gi, nextValue);
+
+  const end = matches.reverse()[0];
+
+  const focusedText = nextValue.slice(end).replace(/<\/div>/gi, '');
+  nextValue = `${nextValue.slice(0, end)}<span id="focused-text">${focusedText}</span></div>`;
+
+  callback(nextValue);
 };
-
-const setFocus = (eventType, ref) => {
-  switch (eventType) {
-    case 'click':
-      setFocusOnClick(ref);
-      break;
-    case 'input':
-      setFocusOnInput(ref);
-      break;
-    default:
-      // eslint-disable-next-line no-console
-      console.info('New event === write new function');
-      break;
-  }
-};
-
-export default setFocus;
