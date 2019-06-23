@@ -185,6 +185,11 @@ export const setFocusOnClick = (ref) => {
 
   const { caretOffset, caretNode } = getCaretPosition();
 
+  console.log(caretNode.innerHTML[caretOffset - 1]);
+  if (caretNode.innerHTML[caretOffset - 1] === '.') {
+    return;
+  }
+
   // if cursor's parent is contenteditable node then do nothing
   if (caretNode === contentEditableNode || caretNode.id === 'focused-text') {
     return;
@@ -200,77 +205,56 @@ export const setFocusOnClick = (ref) => {
   setCaretPosition(selection, focusedNode, newCaretPosition);
 };
 
-export const setFocusOnInput = (ref, value, callback) => {
+export const setFocusOnInput = (ref, event, callback) => {
+  const { value } = event.target;
+  const { data } = event.nativeEvent;
   const contentEditableNode = ref.current;
 
   const { caretOffset, caretNode } = getCaretPosition();
 
-  if (caretNode.id === 'focused-text') {
+  if (caretNode.id === 'focused-text' && data !== '.') {
     callback(dompurify.sanitize(value));
+  } else if (data === '.') {
+    // if cursor's parent is contenteditable node then do nothing
+    if (caretNode === contentEditableNode) {
+      return;
+    }
+    findAndProcessFocusedNode(contentEditableNode);
   } else {
-    // eslint-disable-next-line
-    const domParser = new DOMParser();
-    const doc = domParser.parseFromString(value, 'text/html');
-    const { body } = doc;
+    const nextValue = dompurify.sanitize(contentEditableNode.innerHTML);
+    const matches = matchAll(/\./gi, nextValue);
 
-    const caretPosition = getCaretCharacterOffsetWithin(contentEditableNode);
+    const end = matches.reverse()[0];
 
-    body.childNodes.forEach((node) => {
-      if (node.isEqualNode(caretNode)) {
-        console.log('Coolsies');
-      }
-    });
+    if (matches && end) {
+      findAndProcessFocusedNode(contentEditableNode);
 
-    const focusedNodes = body.querySelectorAll('#focused-text');
-
-    // If focused text exist then move it's text to parent and remove it
-    focusedNodes.forEach((node) => {
-      const { parentNode } = node;
-
-      // copy content to parent if focused node has text
-      if (node.firstChild) {
-        parentNode.insertBefore(node.firstChild, node);
+      if (caretNode === contentEditableNode) {
+        return;
       }
 
-      parentNode.removeChild(node);
-      parentNode.normalize();
-    });
+      const dom = new DOMParser();
+      const doc = dom.parseFromString(nextValue, 'text/html');
 
-    // const { innerHTML } = contentEditableNode;
+      let i = 0;
 
-    // const purifiedHTML = dompurify.sanitize(innerHTML);
+      contentEditableNode.childNodes.forEach((node, index) => {
+        if (node === caretNode) {
+          i = index;
+        }
+      });
 
-    // const matches = matchAll(/\./gi, purifiedHTML);
-    // const indices = [0, ...matches, purifiedHTML.length];
+      const newCaretNode = doc.body.childNodes[i];
 
-    // // Split the text to currentline with cursor postion, before it and after it
-    // const { newCaretPosition, ...purifiedHTMLSplit } = extractSentence(
-    //   caretPosition,
-    //   indices,
-    //   purifiedHTML,
-    // );
+      const { node, focusedNode, newCaretPosition } = createFocusedNode(caretOffset, newCaretNode);
 
-    // const { begin, middle, end } = purifiedHTMLSplit;
+      doc.body.replaceChild(node, newCaretNode);
+      console.log(doc.body);
 
-    // // Edge case: remove text with &nbsp; and add space instead
-    // const spacelessEnd = end.replace(/&nbsp;/gi, '');
+      // setCaretPosition(selection, focusedNode, newCaretPosition);
 
-    // // Create new focused node and fill it's innerHTML and id
-    // const focusedNode = document.createElement('span');
-    // focusedNode.textContent = middle;
-    // focusedNode.id = 'focused-text';
-
-    // // Create a new div to add text
-    // const node = document.createElement('div');
-    // node.append(begin, focusedNode, spacelessEnd);
-    // node.normalize();
-
-    // console.log(node);
-
-    // Replace the cursor's parent with newly created node
-    // body.replaceChild(node, caretNode);
-
-    callback(dompurify.sanitize(contentEditableNode.innerHTML));
+      callback(doc.body.innerHTML);
+    }
   }
 
   // let nextValue = dompurify.sanitize(value);

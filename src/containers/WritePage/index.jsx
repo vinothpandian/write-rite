@@ -32,7 +32,7 @@ const WritePage = ({ user, firebase, match }) => {
   const handleChange = (event) => {
     const { value } = event.target;
 
-    setFocusOnInput(contentEditableRef, value, setWriting);
+    setFocusOnInput(contentEditableRef, event, setWriting);
   };
 
   // React.useEffect(() => {
