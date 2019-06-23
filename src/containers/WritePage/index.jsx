@@ -3,78 +3,38 @@ import PropTypes from 'prop-types';
 import ReactRouterPropTypes from 'react-router-prop-types';
 
 import { compose } from 'recompose';
-import ContentEditable from 'react-contenteditable';
+import { Editor } from 'slate-react';
+import { Value } from 'slate';
+
 import { withAuthorization, withAuthUser } from '../../contexts/Session';
 import Firebase, { withFirebase } from '../../contexts/Firebase';
 import './writePage.scss';
 
+const FocusedText = ({ attributes, children }) => (
+  <div {...attributes} id="focused-text" style={{ color: 'red' }}>
+    {children}
+  </div>
+);
+
+const initialValue = Value.fromJSON({
+  document: {
+    nodes: [
+      {
+        object: 'block',
+        type: 'focusedText',
+        nodes: [
+          {
+            object: 'text',
+            text: 'A line of text in a paragraph.',
+          },
+        ],
+      },
+    ],
+  },
+});
+
 const WritePage = ({ user, firebase, match }) => {
-  const [writing, setWriting] = React.useState(
-    '<div>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.&nbsp; &nbsp;</div><div><br></div><div>Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.&nbsp; &nbsp;</div><div><br></div><div>Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.&nbsp; &nbsp;</div><div><br></div><div>Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.&nbsp; &nbsp;</div><div><br></div><div>Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis.&nbsp; &nbsp;</div><div><br></div><div>At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.&nbsp; &nbsp;</div><div><br></div><div>Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus.&nbsp; &nbsp;</div><div><br></div><div>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.&nbsp; &nbsp;</div><div><br></div><div>Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.&nbsp; &nbsp;</div><div><br></div><div>Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.&nbsp; &nbsp;</div><div><br></div><div>Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo</div>',
-  );
-
-  const { id } = match.params;
-
-  /* $(document).on('click', '#myButton', function () {
-    if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1)
-      var str = $('#myDiv').html().replace(/<br>/gi, '').replace(/<div>/gi, '<br>').replace(/<\/div>/gi, '');
-    else if (navigator.userAgent.toLowerCase().indexOf("firefox") > -1)
-      var str = $('#myDiv').html().replace(/<\/br>/gi, '').replace(/<br>/gi, '<br>').replace(/<\/br>/gi, '');
-    else if (navigator.userAgent.toLowerCase().indexOf("msie") == -1)
-      var str = $('#myDiv').html().replace(/<br>/gi, '').replace(/<p>/gi, '<br>').replace(/<\/p>/gi, '');
-    $('#myDiv2').removeClass('invisible').addClass('visible').text(str);
-    $('#myDiv3').removeClass('invisible').addClass('visible').html(str); */
-
-  const onKeyPress = (event) => {
-    if (
-      (window.navigator.platform.match('Mac') ? event.metaKey : event.ctrlKey)
-      && event.keyCode === 83
-    ) {
-      event.preventDefault();
-
-      firebase.saveWriting(user, id, writing);
-    }
-  };
-
-  const handleChange = (event) => {
-    const userAgent = navigator.userAgent.toLowerCase();
-    let { value } = event.target;
-
-    // value = value.replace(/<br>/gi, '');
-
-    // const parser = new DOMParser();
-    // const doc = parser.parseFromString(value, 'text/html');
-    // const divs = doc.querySelectorAll('div');
-
-    // const lastDiv = divs[divs.length - 1];
-    // const { innerHTML } = lastDiv;
-
-    // lastDiv.innerHTML = `booyea ${innerHTML}`;
-
-    value = value
-      .replace(/<div>/gi, '')
-      .replace(/<\/div>/gi, '')
-      .replace(/<br>/gi, '<div><br/></div>');
-    value = value.replace(/^(\.<\/p>).(\.)/gi, '.</p><p>');
-
-    console.log(value);
-
-    switch (true) {
-      case userAgent.includes('chrome'):
-        // console.log(value);
-        setWriting(value);
-        break;
-      case userAgent.includes('firefox'):
-        setWriting(value);
-        break;
-      case userAgent.includes('msie'):
-        setWriting(value);
-        break;
-      default:
-        setWriting(value);
-        break;
-    }
-  };
+  const [writing, setWriting] = React.useState(initialValue);
 
   // React.useEffect(() => {
   //   async function fetchAll() {
@@ -87,21 +47,27 @@ const WritePage = ({ user, firebase, match }) => {
   //   fetchAll();
   // }, [user, firebase, id]);
 
+  // Add a `renderBlock` method to render a `CodeNode` for code blocks.
+  const renderBlock = (props, editor, next) => {
+    switch (props.node.type) {
+      case 'focusedText':
+        return <FocusedText {...props} />;
+      default:
+        return next();
+    }
+  };
+
   return (
     <div className="wrapper1">
       <div className="wrapper2">
-        <ContentEditable
-          autoComplete="off"
-          autoCorrect="off"
-          autoCapitalize="off"
-          spellCheck="false"
+        <Editor
           className="contentEditableContainer"
-          html={writing}
-          tagName="div"
-          onChange={handleChange}
-          onKeyDown={onKeyPress}
-          onClick={() => {
-            console.log('goo');
+          value={writing}
+          renderBlock={renderBlock}
+          onChange={({ value }) => {
+            console.log(JSON.stringify(value.document.nodes));
+
+            setWriting(value);
           }}
         />
       </div>
