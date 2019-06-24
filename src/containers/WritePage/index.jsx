@@ -87,6 +87,7 @@ const WritePage = () => {
           renderAnnotation={renderAnnotation}
           placeholder="Write here.."
           value={writing}
+          autoFocus
           spellCheck={false}
           onChange={({ value }) => {
             setWriting(value);

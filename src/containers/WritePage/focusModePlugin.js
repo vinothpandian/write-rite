@@ -10,25 +10,40 @@ export const matchAll = (regex, text) => {
   return matches;
 };
 
-const extractSentence = (offset, indices, text) => {
+const extractSentence = (offset, indices) => {
+  const absOffset = offset < 0 ? 0 : offset;
   const sortedIndices = indices.sort((a, b) => a - b);
 
-  console.log(offset, indices);
-
-  const textStart = sortedIndices[0];
-  const textEnd = sortedIndices[sortedIndices.length - 1];
+  let start = indices[0];
+  let end = indices[indices.length - 1];
 
   let i = 0;
-  while (sortedIndices[i] < offset) {
-    i += 1;
+  indices.forEach((value) => {
+    if (absOffset > value) {
+      i += 1;
+    }
+  });
+
+  if (i === 0) {
+    return {
+      start,
+      end: indices[1],
+    };
   }
 
-  const startIndex = sortedIndices[i - 1] || textStart;
-  const endIndex = sortedIndices[i] || textEnd;
+  if (i === indices.length) {
+    return {
+      start: indices[i - 2],
+      end: indices[i - 1],
+    };
+  }
+
+  start = sortedIndices[i - 1] || start;
+  end = sortedIndices[i] || end;
 
   return {
-    startIndex,
-    endIndex,
+    start,
+    end,
   };
 };
 
@@ -46,7 +61,7 @@ const setFocus = (event, editor) => {
   });
 
   const matches = matchAll(/\./gi, anchorText.text);
-  const indices = [0, ...matches, anchorText.text.length];
+  const indices = [...new Set([0, ...matches, anchorText.text.length - 1])];
 
   const offset = event.type === 'keydown' ? anchor.offset - 1 : anchor.offset;
 
@@ -56,8 +71,8 @@ const setFocus = (event, editor) => {
 
   // range = event.type === 'keydown' ? range.moveFocusBackward(2) : range.moveFocusBackward(3);
 
-  range = range.moveAnchorTo(anchor.path, data.startIndex);
-  range = range.moveFocusTo(focus.path, data.endIndex);
+  range = range.moveAnchorTo(anchor.path, data.start);
+  range = range.moveFocusTo(focus.path, data.end);
 
   editor.withoutSaving(() => {
     editor.addAnnotation({
@@ -78,7 +93,7 @@ function focusModePlugin(options) {
 
   // Return our "plugin" object, containing the `onKeyDown` handler.
   return {
-    onKeyDown(event, editor, next) {
+    onKeyUp(event, editor, next) {
       // If it doesn't match our `key`, let other plugins handle it.
       setFocus(event, editor);
 
