@@ -1,4 +1,4 @@
-import { Decoration, Range, Mark } from 'slate';
+import { Range } from 'slate';
 
 export const matchAll = (regex, text) => {
   const matches = [];
@@ -34,7 +34,7 @@ const extractSentence = (offset, indices) => {
   if (i === indices.length) {
     return {
       start: indices[i - 2],
-      end: indices[i - 1],
+      end: indices[i - 1] + 1,
     };
   }
 
@@ -45,10 +45,6 @@ const extractSentence = (offset, indices) => {
     start,
     end,
   };
-};
-
-const debug = (text) => {
-  console.log(JSON.stringify(text, null, '\t'));
 };
 
 const setFocus = (event, editor) => {
@@ -67,10 +63,6 @@ const setFocus = (event, editor) => {
 
   const data = extractSentence(offset, indices, anchorText.text);
 
-  debug(data);
-
-  // range = event.type === 'keydown' ? range.moveFocusBackward(2) : range.moveFocusBackward(3);
-
   range = range.moveAnchorTo(anchor.path, data.start);
   range = range.moveFocusTo(focus.path, data.end);
 
@@ -82,31 +74,15 @@ const setFocus = (event, editor) => {
       focus: range.focus,
     });
   });
-
-  // const node = blocks.getNode(anchor.key);
-
-  // console.log(blocks);
 };
 
 function focusModePlugin(options) {
-  const { type, key } = options;
-
-  // Return our "plugin" object, containing the `onKeyDown` handler.
   return {
     onKeyUp(event, editor, next) {
-      // If it doesn't match our `key`, let other plugins handle it.
       setFocus(event, editor);
-
       return next();
     },
     onClick(event, editor, next) {
-      //   const selectedNodeKey = editor.value.selection.anchor.key;
-      // const { marks } = editor.value;
-
-      // marks.forEach((mark) => {
-      //   console.log(mark.type);
-      // });
-
       setFocus(event, editor);
       return next();
     },
