@@ -1,31 +1,42 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
-import ReactRouterPropTypes from 'react-router-prop-types';
-
-import { compose } from 'recompose';
 import { Editor } from 'slate-react';
 import { Value } from 'slate';
 
-import { withAuthorization, withAuthUser } from '../../contexts/Session';
-import Firebase, { withFirebase } from '../../contexts/Firebase';
 import './writePage.scss';
+import focusModePlugin from './focusModePlugin';
 
-const FocusedText = ({ attributes, children }) => (
-  <div {...attributes} id="focused-text" style={{ color: 'red' }}>
-    {children}
-  </div>
-);
-
-const initialValue = Value.fromJSON({
+const emptyValue = Value.fromJSON({
   document: {
     nodes: [
       {
         object: 'block',
-        type: 'focusedText',
+        type: 'paragraph',
         nodes: [
           {
             object: 'text',
-            text: 'A line of text in a paragraph.',
+            text:
+              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vel risus commodo viverra maecenas. Gravida dictum fusce ut placerat orci nulla pellentesque dignissim enim.',
+          },
+        ],
+      },
+      {
+        object: 'block',
+        type: 'paragraph',
+        nodes: [
+          {
+            object: 'text',
+            text: '',
+          },
+        ],
+      },
+      {
+        object: 'block',
+        type: 'paragraph',
+        nodes: [
+          {
+            object: 'text',
+            text:
+              'Duis tristique sollicitudin nibh sit amet commodo nulla facilisi. Donec ac odio tempor orci dapibus. Quis enim lobortis scelerisque fermentum dui faucibus in ornare. Elit sed vulputate mi sit amet mauris commodo. Viverra nam libero justo laoreet sit amet cursus. Morbi tempus iaculis urna id volutpat lacus laoreet non curabitur. Rutrum tellus pellentesque eu tincidunt.',
           },
         ],
       },
@@ -33,25 +44,35 @@ const initialValue = Value.fromJSON({
   },
 });
 
-const WritePage = ({ user, firebase, match }) => {
-  const [writing, setWriting] = React.useState(initialValue);
+const boldPlugin = focusModePlugin({
+  type: 'bold',
+  key: 'b',
+});
 
-  // React.useEffect(() => {
-  //   async function fetchAll() {
-  //     if (user) {
-  //       const data = await firebase.getWriting(user, id);
-  //       setWriting(data);
-  //     }
-  //   }
+const plugins = [boldPlugin];
 
-  //   fetchAll();
-  // }, [user, firebase, id]);
+const WritePage = () => {
+  const [writing, setWriting] = React.useState(emptyValue);
 
-  // Add a `renderBlock` method to render a `CodeNode` for code blocks.
-  const renderBlock = (props, editor, next) => {
-    switch (props.node.type) {
-      case 'focusedText':
-        return <FocusedText {...props} />;
+  const renderMark = (props, editor, next) => {
+    switch (props.mark.type) {
+      case 'bold':
+        return <strong {...props.attributes}>{props.children}</strong>;
+      default:
+        return next();
+    }
+  };
+
+  const renderAnnotation = (props, editor, next) => {
+    const { children, annotation, attributes } = props;
+
+    switch (annotation.type) {
+      case 'highlight':
+        return (
+          <span {...attributes} className="focused-text">
+            {children}
+          </span>
+        );
       default:
         return next();
     }
@@ -62,11 +83,12 @@ const WritePage = ({ user, firebase, match }) => {
       <div className="wrapper2">
         <Editor
           className="contentEditableContainer"
+          plugins={plugins}
+          renderAnnotation={renderAnnotation}
+          placeholder="Write here.."
           value={writing}
-          renderBlock={renderBlock}
+          spellCheck={false}
           onChange={({ value }) => {
-            console.log(JSON.stringify(value.document.nodes));
-
             setWriting(value);
           }}
         />
@@ -75,20 +97,4 @@ const WritePage = ({ user, firebase, match }) => {
   );
 };
 
-WritePage.propTypes = {
-  user: PropTypes.string,
-  firebase: PropTypes.instanceOf(Firebase).isRequired,
-  match: ReactRouterPropTypes.match.isRequired,
-};
-
-WritePage.defaultProps = {
-  user: '',
-};
-
-const condition = user => !!user;
-
-export default compose(
-  withFirebase,
-  withAuthUser('uid'),
-  withAuthorization(condition),
-)(WritePage);
+export default WritePage;
