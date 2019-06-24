@@ -44,24 +44,10 @@ const emptyValue = Value.fromJSON({
   },
 });
 
-const boldPlugin = focusModePlugin({
-  type: 'bold',
-  key: 'b',
-});
-
-const plugins = [boldPlugin];
+const plugins = [focusModePlugin()];
 
 const WritePage = () => {
   const [writing, setWriting] = React.useState(emptyValue);
-
-  const renderMark = (props, editor, next) => {
-    switch (props.mark.type) {
-      case 'bold':
-        return <strong {...props.attributes}>{props.children}</strong>;
-      default:
-        return next();
-    }
-  };
 
   const renderAnnotation = (props, editor, next) => {
     const { children, annotation, attributes } = props;
@@ -82,13 +68,13 @@ const WritePage = () => {
     <div className="wrapper1">
       <div className="wrapper2">
         <Editor
-          className="contentEditableContainer"
-          plugins={plugins}
-          renderAnnotation={renderAnnotation}
-          placeholder="Write here.."
-          value={writing}
           autoFocus
           spellCheck={false}
+          className="contentEditableContainer"
+          placeholder="Write here.."
+          value={writing}
+          plugins={plugins}
+          renderAnnotation={renderAnnotation}
           onChange={({ value }) => {
             setWriting(value);
           }}
