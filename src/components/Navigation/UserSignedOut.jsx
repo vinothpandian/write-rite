@@ -1,15 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ThemedButton } from '../../styled-components';
+import TextButton from '../TextButton';
 
 const UserSignedOut = ({ variant, showSignIn, showSignUp }) => (
   <React.Fragment>
-    <ThemedButton variant={variant} onClick={showSignIn}>
+    <TextButton placement="navbar" variant={variant} onClick={showSignIn}>
       Sign in
-    </ThemedButton>
-    <ThemedButton variant={variant} onClick={showSignUp}>
+    </TextButton>
+    <TextButton placement="navbar" variant={variant} onClick={showSignUp}>
       Sign up
-    </ThemedButton>
+    </TextButton>
   </React.Fragment>
 );
 

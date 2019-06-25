@@ -2,14 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import SignOut from '../SignOut';
-import { ThemedButton } from '../../styled-components';
+import TextButton from '../TextButton';
 
 const UserSignedIn = ({ dashboard, variant, redirectToDashboard }) => (
   <React.Fragment>
     {!dashboard && (
-      <ThemedButton variant={variant} onClick={redirectToDashboard}>
+      <TextButton placement="navbar" variant={variant} onClick={redirectToDashboard}>
         Dashboard
-      </ThemedButton>
+      </TextButton>
     )}
     <SignOut variant={variant} />
   </React.Fragment>

@@ -6,7 +6,7 @@ import { compose } from 'recompose';
 import { withRouter } from 'react-router';
 import Firebase, { withFirebase } from '../../contexts/Firebase';
 import { LANDING } from '../../constants/routes';
-import { ThemedButton } from '../../styled-components';
+import TextButton from '../TextButton';
 
 const SignOut = ({ firebase, history, variant }) => {
   const handleSignOut = () => {
@@ -15,9 +15,9 @@ const SignOut = ({ firebase, history, variant }) => {
   };
 
   return (
-    <ThemedButton variant={variant} onClick={handleSignOut}>
+    <TextButton placement="navbar" variant={variant} onClick={handleSignOut}>
       Sign out
-    </ThemedButton>
+    </TextButton>
   );
 };
 

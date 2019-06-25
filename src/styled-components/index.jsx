@@ -4,8 +4,8 @@ import Jumbotron from 'react-bootstrap/Jumbotron';
 import Container from 'react-bootstrap/Container';
 import Modal from 'react-bootstrap/Modal';
 
-export const ThemedButton = styled(Button)(({ theme }) => {
-  if (!theme) {
+export const ThemedButton = styled(Button)(({ placement, theme }) => {
+  if (placement === 'navbar') {
     return {
       outline: 'none',
       border: 'none',

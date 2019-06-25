@@ -1,6 +1,6 @@
 import { Value } from 'slate';
 
-const debugValue = Value.fromJSON({
+export const debugValue = Value.fromJSON({
   document: {
     nodes: [
       {
@@ -39,7 +39,7 @@ const debugValue = Value.fromJSON({
   },
 });
 
-const emptyValue = Value.fromJSON({
+export const emptyValue = Value.fromJSON({
   document: {
     nodes: [
       {
@@ -56,5 +56,27 @@ const emptyValue = Value.fromJSON({
   },
 });
 
-// eslint-disable-next-line
-export { debugValue, emptyValue };
+export function toggleFullScreen() {
+  const doc = window.document;
+  const docEl = doc.documentElement;
+
+  const requestFullScreen = docEl.requestFullscreen
+    || docEl.mozRequestFullScreen
+    || docEl.webkitRequestFullScreen
+    || docEl.msRequestFullscreen;
+  const cancelFullScreen = doc.exitFullscreen
+    || doc.mozCancelFullScreen
+    || doc.webkitExitFullscreen
+    || doc.msExitFullscreen;
+
+  if (
+    !doc.fullscreenElement
+    && !doc.mozFullScreenElement
+    && !doc.webkitFullscreenElement
+    && !doc.msFullscreenElement
+  ) {
+    requestFullScreen.call(docEl);
+  } else {
+    cancelFullScreen.call(doc);
+  }
+}
