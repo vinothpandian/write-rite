@@ -35,9 +35,10 @@ const extractSentence = (offset, indices) => {
   };
 };
 
-const setFocus = (event, editor) => {
+export const setFocus = (editor) => {
   const { anchor, focus } = editor.value.selection;
   const { text } = editor.value.anchorText;
+  const { offset } = anchor;
 
   let range = Range.create({
     anchor,
@@ -46,8 +47,6 @@ const setFocus = (event, editor) => {
 
   const matches = matchAll(/\./gi, text);
   const indices = [...new Set([0, ...matches, text.length])];
-
-  const offset = event.type === 'keydown' ? anchor.offset - 1 : anchor.offset;
 
   const data = extractSentence(offset, indices, text);
 
@@ -67,11 +66,11 @@ const setFocus = (event, editor) => {
 function focusModePlugin(options) {
   return {
     onKeyUp(event, editor, next) {
-      setFocus(event, editor);
+      setFocus(editor);
       return next();
     },
     onClick(event, editor, next) {
-      setFocus(event, editor);
+      setFocus(editor);
       return next();
     },
   };

@@ -12,7 +12,7 @@ import { withAuthorization, withAuthUser } from '../../contexts/Session';
 import Firebase, { withFirebase } from '../../contexts/Firebase';
 
 import './writePage.scss';
-import focusModePlugin from './focusModePlugin';
+import focusModePlugin, { setFocus } from './focusModePlugin';
 import { emptyValue } from '../../utils';
 import { storeLocally, getWritingLocally } from '../../utils/localDB';
 
@@ -36,7 +36,17 @@ const WritePage = ({ user, firebase, match }) => {
         let value = firebaseTimestamp > localTimestamp ? firebaseWriting : localWriting;
 
         value = Value.fromJSON(value);
+
         setWriting(value);
+
+        const { editor } = editorRef.current;
+
+        editor
+          .moveToRangeOfDocument()
+          .moveToEnd()
+          .focus();
+
+        setFocus(editor);
       }
     }
 
