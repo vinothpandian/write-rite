@@ -1,55 +1,49 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
+import { withRouter } from 'react-router';
+
 import { Editor } from 'slate-react';
 import { Value } from 'slate';
 
+import ReactRouterPropTypes from 'react-router-prop-types';
+
+import { compose } from 'recompose';
+import { withAuthorization, withAuthUser } from '../../contexts/Session';
+import Firebase, { withFirebase } from '../../contexts/Firebase';
+
 import './writePage.scss';
 import focusModePlugin from './focusModePlugin';
-
-const emptyValue = Value.fromJSON({
-  document: {
-    nodes: [
-      {
-        object: 'block',
-        type: 'paragraph',
-        nodes: [
-          {
-            object: 'text',
-            text:
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vel risus commodo viverra maecenas. Gravida dictum fusce ut placerat orci nulla pellentesque dignissim enim.',
-          },
-        ],
-      },
-      {
-        object: 'block',
-        type: 'paragraph',
-        nodes: [
-          {
-            object: 'text',
-            text: '',
-          },
-        ],
-      },
-      {
-        object: 'block',
-        type: 'paragraph',
-        nodes: [
-          {
-            object: 'text',
-            text:
-              'Duis tristique sollicitudin nibh sit amet commodo nulla facilisi. Donec ac odio tempor orci dapibus. Quis enim lobortis scelerisque fermentum dui faucibus in ornare. Elit sed vulputate mi sit amet mauris commodo. Viverra nam libero justo laoreet sit amet cursus. Morbi tempus iaculis urna id volutpat lacus laoreet non curabitur. Rutrum tellus pellentesque eu tincidunt.',
-          },
-        ],
-      },
-    ],
-  },
-});
+import { emptyValue } from '../../utils';
+import { storeLocally, getWritingLocally } from '../../utils/localDB';
 
 const plugins = [focusModePlugin()];
 
-const WritePage = () => {
+const WritePage = ({ user, firebase, match }) => {
   const [writing, setWriting] = React.useState(emptyValue);
+  const { id } = match.params;
+
+  React.useEffect(() => {
+    async function fetchAll() {
+      if (user) {
+        const {
+          timestamp: firebaseTimestamp,
+          writing: firebaseWriting,
+        } = await firebase.getWriting(id);
+
+        const { timestamp: localTimestamp, writing: localWriting } = getWritingLocally(id);
+
+        let value = firebaseTimestamp > localTimestamp ? firebaseWriting : localWriting;
+
+        value = Value.fromJSON(value);
+        setWriting(value);
+      }
+    }
+
+    fetchAll();
+  }, [user, firebase, id]);
 
   const renderAnnotation = (props, editor, next) => {
+    // eslint-disable-next-line
     const { children, annotation, attributes } = props;
 
     switch (annotation.type) {
@@ -62,6 +56,27 @@ const WritePage = () => {
       default:
         return next();
     }
+  };
+
+  const onKeyDown = (event, editor, next) => {
+    const { value } = editor;
+    storeLocally(id, value.toJSON());
+
+    if (event.key !== 's' || !event.ctrlKey) return next();
+    event.preventDefault();
+
+    const { text } = editor.value.document.getFirstText();
+
+    const trimmedText = text.trim();
+    const topicChars = 20;
+
+    let topic = trimmedText.length > topicChars ? `${trimmedText.slice(0, topicChars)}...` : trimmedText;
+
+    topic = topic || 'Untitled';
+
+    firebase.saveWriting(id, topic, value.toJSON());
+
+    return true;
   };
 
   return (
@@ -78,10 +93,28 @@ const WritePage = () => {
           onChange={({ value }) => {
             setWriting(value);
           }}
+          onKeyDown={onKeyDown}
         />
       </div>
     </div>
   );
 };
 
-export default WritePage;
+WritePage.propTypes = {
+  user: PropTypes.string,
+  firebase: PropTypes.instanceOf(Firebase).isRequired,
+  match: ReactRouterPropTypes.match.isRequired,
+};
+
+WritePage.defaultProps = {
+  user: '',
+};
+
+const condition = user => !!user;
+
+export default compose(
+  withFirebase,
+  withRouter,
+  withAuthUser('uid'),
+  withAuthorization(condition),
+)(WritePage);

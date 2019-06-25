@@ -5,7 +5,12 @@ import WritingItem from './WritingItem';
 
 const TopicList = ({ writings }) => {
   const topicList = writings.map(writing => (
-    <WritingItem key={writing.id} id={writing.id} topic={writing.topic} />
+    <WritingItem
+      key={writing.id}
+      id={writing.id}
+      topic={writing.topic}
+      timestamp={writing.timestamp}
+    />
   ));
 
   return topicList;
@@ -16,6 +21,7 @@ TopicList.propTypes = {
     PropTypes.shape({
       id: PropTypes.string,
       topic: PropTypes.string,
+      timestamp: PropTypes.number,
     }),
   ).isRequired,
 };

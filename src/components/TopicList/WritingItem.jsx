@@ -6,7 +6,9 @@ import ReactRouterPropTypes from 'react-router-prop-types';
 
 import { ThemedButton } from '../../styled-components';
 
-const WritingItem = ({ history, id, topic }) => (
+const WritingItem = ({
+  history, id, topic, timestamp,
+}) => (
   <ThemedButton
     variant="outline-dark"
     onClick={() => {
@@ -15,12 +17,16 @@ const WritingItem = ({ history, id, topic }) => (
     block
   >
     {topic}
+    {' '}
+-
+    {new Date(timestamp).toTimeString()}
   </ThemedButton>
 );
 
 WritingItem.propTypes = {
   id: PropTypes.string.isRequired,
   topic: PropTypes.string.isRequired,
+  timestamp: PropTypes.number.isRequired,
   history: ReactRouterPropTypes.history.isRequired,
 };
 

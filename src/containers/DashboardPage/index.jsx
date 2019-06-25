@@ -25,7 +25,7 @@ const DashboardPage = ({
   React.useEffect(() => {
     async function fetchAll() {
       if (user) {
-        const data = await firebase.getWritings(user);
+        const data = await firebase.getWritings();
         setWritings(data);
       }
     }
@@ -34,7 +34,7 @@ const DashboardPage = ({
   }, [user, firebase]);
 
   const addWriting = () => {
-    const key = firebase.addWriting(user);
+    const key = firebase.addWriting();
     history.push(`write/${key}`);
   };
 

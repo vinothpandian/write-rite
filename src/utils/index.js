@@ -1,26 +1,60 @@
-export const validateEmail = (email) => {
-  let errorMessage;
+import { Value } from 'slate';
 
-  if (!email) {
-    errorMessage = 'Required';
-  }
+const debugValue = Value.fromJSON({
+  document: {
+    nodes: [
+      {
+        object: 'block',
+        type: 'paragraph',
+        nodes: [
+          {
+            object: 'text',
+            text:
+              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vel risus commodo viverra maecenas. Gravida dictum fusce ut placerat orci nulla pellentesque dignissim enim.',
+          },
+        ],
+      },
+      {
+        object: 'block',
+        type: 'paragraph',
+        nodes: [
+          {
+            object: 'text',
+            text: '',
+          },
+        ],
+      },
+      {
+        object: 'block',
+        type: 'paragraph',
+        nodes: [
+          {
+            object: 'text',
+            text:
+              'Duis tristique sollicitudin nibh sit amet commodo nulla facilisi. Donec ac odio tempor orci dapibus. Quis enim lobortis scelerisque fermentum dui faucibus in ornare. Elit sed vulputate mi sit amet mauris commodo. Viverra nam libero justo laoreet sit amet cursus. Morbi tempus iaculis urna id volutpat lacus laoreet non curabitur. Rutrum tellus pellentesque eu tincidunt.',
+          },
+        ],
+      },
+    ],
+  },
+});
 
-  // eslint-disable-next-line
-  const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  const isEmail = re.test(String(email).toLowerCase());
+const emptyValue = Value.fromJSON({
+  document: {
+    nodes: [
+      {
+        object: 'block',
+        type: 'paragraph',
+        nodes: [
+          {
+            object: 'text',
+            text: '',
+          },
+        ],
+      },
+    ],
+  },
+});
 
-  if (!isEmail) {
-    errorMessage = 'Invalid email address';
-  }
-
-  return errorMessage;
-};
-
-export const validateField = (value) => {
-  let errorMessage;
-
-  if (!value) {
-    errorMessage = 'Required';
-  }
-  return errorMessage;
-};
+// eslint-disable-next-line
+export { debugValue, emptyValue };
