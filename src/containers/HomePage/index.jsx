@@ -48,5 +48,5 @@ HomePage.propTypes = {
 
 export default compose(
   withRouter,
-  withAuthUser(),
+  withAuthUser('uid'),
 )(HomePage);
