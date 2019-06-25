@@ -10,6 +10,7 @@ import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
+import Alert from 'react-bootstrap/Alert';
 
 import Firebase, { withFirebase } from '../../contexts/Firebase';
 import { DASHBOARD } from '../../constants/routes';
@@ -99,7 +100,7 @@ const SignUpForm = (props) => {
                 </Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Control.Feedback type="invalid">{errorMessage}</Form.Control.Feedback>
+              {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
             </Form.Row>
           </Modal.Body>
 
