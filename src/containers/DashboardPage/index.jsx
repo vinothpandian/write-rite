@@ -52,7 +52,13 @@ const DashboardPage = ({
       <PaddedContainer>
         <Row className="justify-content-center">
           <Col xs="10" md="8" lg="6">
-            <ThemedButton variant="outline-dark" block type="button" onClick={addWriting}>
+            <ThemedButton
+              theme={theme}
+              variant="outline-dark"
+              block
+              type="button"
+              onClick={addWriting}
+            >
               + Add Writing
             </ThemedButton>
 

@@ -95,7 +95,7 @@ class Firebase {
     };
   }
 
-  saveWriting(id, topic, writing) {
+  saveWriting(id, writing) {
     const userID = this.getUserID();
 
     if (!userID) {
@@ -105,13 +105,22 @@ class Firebase {
 
     const timestamp = Date.now();
 
+    const { text } = writing.document.getFirstText();
+
+    const trimmedText = text.trim();
+    const topicChars = 20;
+
+    let topic = trimmedText.length > topicChars ? `${trimmedText.slice(0, topicChars)}...` : trimmedText;
+
+    topic = topic || 'Untitled';
+
     this.databaseRef(userID)
       .child('writings')
       .update({
         [id]: {
           topic,
           timestamp,
-          writing,
+          writing: writing.toJSON(),
         },
       });
   }

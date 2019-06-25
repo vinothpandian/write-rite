@@ -19,6 +19,7 @@ import { storeLocally, getWritingLocally } from '../../utils/localDB';
 const plugins = [focusModePlugin()];
 
 const WritePage = ({ user, firebase, match }) => {
+  const editorRef = React.useRef(null);
   const [writing, setWriting] = React.useState(emptyValue);
   const { id } = match.params;
 
@@ -39,7 +40,16 @@ const WritePage = ({ user, firebase, match }) => {
       }
     }
 
+    function cleanUp() {
+      if (user && editorRef) {
+        const { value } = editorRef.current.editor;
+        firebase.saveWriting(id, value);
+      }
+    }
+
     fetchAll();
+
+    return cleanUp;
   }, [user, firebase, id]);
 
   const renderAnnotation = (props, editor, next) => {
@@ -60,29 +70,26 @@ const WritePage = ({ user, firebase, match }) => {
 
   const onKeyDown = (event, editor, next) => {
     const { value } = editor;
-    storeLocally(id, value.toJSON());
 
     if (event.key !== 's' || !event.ctrlKey) return next();
     event.preventDefault();
 
-    const { text } = editor.value.document.getFirstText();
-
-    const trimmedText = text.trim();
-    const topicChars = 20;
-
-    let topic = trimmedText.length > topicChars ? `${trimmedText.slice(0, topicChars)}...` : trimmedText;
-
-    topic = topic || 'Untitled';
-
-    firebase.saveWriting(id, topic, value.toJSON());
+    firebase.saveWriting(id, value);
 
     return true;
+  };
+
+  const onKeyUp = (event, editor, next) => {
+    const { value } = editor;
+    storeLocally(id, value.toJSON());
+    return next();
   };
 
   return (
     <div className="wrapper1">
       <div className="wrapper2">
         <Editor
+          ref={editorRef}
           autoFocus
           spellCheck={false}
           className="contentEditableContainer"
@@ -94,6 +101,7 @@ const WritePage = ({ user, firebase, match }) => {
             setWriting(value);
           }}
           onKeyDown={onKeyDown}
+          onKeyUp={onKeyUp}
         />
       </div>
     </div>
