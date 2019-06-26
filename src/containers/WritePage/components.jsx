@@ -10,7 +10,6 @@ export const WritingAreaWrapper = styled.section({
   minHeight: '100%',
   display: 'flex',
   overflow: 'hidden',
-  //   position: relative;
 });
 
 export const ContentEditable = styled(Editor)({
@@ -22,6 +21,6 @@ export const ContentEditable = styled(Editor)({
   boxSizing: 'content-box',
   flexDirection: 'column',
   justifyContent: 'flex-end',
-  margin: '1rem',
+  margin: '2rem',
   overflow: 'hidden',
 });

@@ -94,10 +94,9 @@ const WritePage = ({ user, firebase, match }) => {
   };
 
   return (
-    <WritingAreaContainer className="container">
-      <WritingAreaWrapper className="wrapper">
+    <WritingAreaContainer>
+      <WritingAreaWrapper>
         <ContentEditable
-          className="writingArea"
           ref={editorRef}
           autoFocus
           spellCheck={false}
