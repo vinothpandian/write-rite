@@ -56,7 +56,7 @@ export const setFocus = (editor) => {
   editor.withoutSaving(() => {
     editor.addAnnotation({
       key: 'focused-text',
-      type: 'highlight',
+      type: 'focused-text',
       anchor: range.anchor,
       focus: range.focus,
     });
