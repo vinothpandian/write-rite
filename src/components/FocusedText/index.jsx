@@ -7,9 +7,8 @@ const StyledSpan = styled.span(({ themeClass }) => {
   const color = themeClass === 'light' ? 'black' : 'white';
 
   return {
-    color,
     '& span': {
-      color,
+      color: `${color} !important`,
     },
   };
 });

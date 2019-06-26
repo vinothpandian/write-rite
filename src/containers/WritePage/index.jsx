@@ -5,6 +5,7 @@ import ReactRouterPropTypes from 'react-router-prop-types';
 import { compose } from 'recompose';
 import { withRouter } from 'react-router';
 import { Value } from 'slate';
+import customProps from '../../proptypes';
 
 import Firebase, { withFirebase } from '../../contexts/Firebase';
 import { withAuthorization, withAuthUser } from '../../contexts/Session';
@@ -17,10 +18,13 @@ import focusModePlugin, { setFocus } from './focusModePlugin';
 import { emptyValue } from '../../utils';
 
 import { storeLocally, getWritingLocally } from '../../utils/localDB';
+import { withTheme } from '../../contexts/Theme';
 
 const plugins = [focusModePlugin()];
 
-const WritePage = ({ user, firebase, match }) => {
+const WritePage = ({
+  theme, user, firebase, match,
+}) => {
   const editorRef = React.useRef(null);
   const [writing, setWriting] = React.useState(emptyValue);
   const { id } = match.params;
@@ -95,7 +99,7 @@ const WritePage = ({ user, firebase, match }) => {
 
   return (
     <WritingAreaContainer>
-      <WritingAreaWrapper>
+      <WritingAreaWrapper themeClass={theme.className}>
         <ContentEditable
           ref={editorRef}
           autoFocus
@@ -116,6 +120,7 @@ const WritePage = ({ user, firebase, match }) => {
 };
 
 WritePage.propTypes = {
+  theme: customProps.theme.isRequired,
   user: PropTypes.string,
   firebase: PropTypes.instanceOf(Firebase).isRequired,
   match: ReactRouterPropTypes.match.isRequired,
@@ -128,6 +133,7 @@ WritePage.defaultProps = {
 const condition = user => !!user;
 
 export default compose(
+  withTheme,
   withFirebase,
   withRouter,
   withAuthUser('uid'),

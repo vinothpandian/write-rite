@@ -6,10 +6,16 @@ export const WritingAreaContainer = styled.main({
   overflowY: 'auto',
 });
 
-export const WritingAreaWrapper = styled.section({
-  minHeight: '100%',
-  display: 'flex',
-  overflow: 'hidden',
+export const WritingAreaWrapper = styled.section(({ themeClass }) => {
+  const color = themeClass === 'light' ? '#ccc' : '#666';
+  return {
+    minHeight: '100%',
+    display: 'flex',
+    overflow: 'hidden',
+    '& *': {
+      color: `${color} !important`,
+    },
+  };
 });
 
 export const ContentEditable = styled(Editor)({
