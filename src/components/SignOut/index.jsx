@@ -2,7 +2,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import ReactRouterPropTypes from 'react-router-prop-types';
 
-import { compose } from 'recompose';
+import { compose } from '../../utils';
 import { withRouter } from 'react-router';
 import Firebase, { withFirebase } from '../../contexts/Firebase';
 import { LANDING } from '../../constants/routes';

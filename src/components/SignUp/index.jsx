@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import ReactRouterPropTypes from 'react-router-prop-types';
 
 import { Field, Formik } from 'formik';
-import { compose } from 'recompose';
+import { compose } from '../../utils';
 import { withRouter } from 'react-router';
 import { validateField as validate, validateEmail } from '../../utils';
 import Firebase, { withFirebase } from '../../contexts/Firebase';
