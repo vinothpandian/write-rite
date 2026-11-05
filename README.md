@@ -1,68 +1,18 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Write Rite
 
-## Available Scripts
+React writing-app prototype with email/password Firebase authentication, protected routes, and persistent light/dark themes. The writing page and password-reset action retain their existing prototype behavior.
 
-In the project directory, you can run:
+Requires Node.js 22.12+. Install with `npm ci` or Yarn 1 `yarn install --frozen-lockfile`.
 
-### `npm start`
+- `npm start`: run Vite on port 3000.
+- `npm run build`: generate the production site in `build/`.
+- `npm run test:run`: run authentication, route, theme, and subscription-cleanup regression tests.
+- `npm test`: watch tests.
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Keep the existing Firebase configuration names in `.env.local`: `REACT_APP_APIKEY`, `REACT_APP_AUTH_DOMAIN`, `REACT_APP_DATABASEURL`, `REACT_APP_PROJECT_ID`, `REACT_APP_STORAGEBUCKET`, `REACT_APP_MESSAGING_SENDER_ID`, and `REACT_APP_APP_ID`. Vite exposes these client configuration values through `import.meta.env`; other environment variables are not exposed. Enable email/password authentication and authorize your deployed domain in Firebase.
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+Vite/Vitest replace CRA, Emotion uses its current React package, and Firebase uses the maintained compatibility imports to preserve the existing wrapper API. Formik is upgraded, and the only used Recompose helper is replaced locally. Authentication subscriptions unsubscribe on unmount, the Firebase provider keeps a stable instance, and sign-in waits for authentication before navigation and displays credential errors.
 
-### `npm test`
+The gRPC patch floor in npm overrides/Yarn resolutions avoids the vulnerable transitive version pinned by Firebase's Firestore package. The app currently uses Firebase Auth only.
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+Production hosting must fall back to `index.html` for browser routes. Service-worker registration stays disabled by default; a generated offline shell remains available for the existing opt-in registration. Tests use mocked authentication and do not access a live Firebase project.

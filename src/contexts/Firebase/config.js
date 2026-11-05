@@ -1,11 +1,11 @@
 const firebaseConfig = {
-  apiKey: process.env.REACT_APP_APIKEY,
-  authDomain: process.env.REACT_APP_AUTH_DOMAIN,
-  databaseURL: process.env.REACT_APP_DATABASEURL,
-  projectId: process.env.REACT_APP_PROJECT_ID,
-  storageBucket: process.env.REACT_APP_STORAGEBUCKET,
-  messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
-  appId: process.env.REACT_APP_APP_ID,
+  apiKey: import.meta.env.REACT_APP_APIKEY,
+  authDomain: import.meta.env.REACT_APP_AUTH_DOMAIN,
+  databaseURL: import.meta.env.REACT_APP_DATABASEURL,
+  projectId: import.meta.env.REACT_APP_PROJECT_ID,
+  storageBucket: import.meta.env.REACT_APP_STORAGEBUCKET,
+  messagingSenderId: import.meta.env.REACT_APP_MESSAGING_SENDER_ID,
+  appId: import.meta.env.REACT_APP_APP_ID,
 };
 
 export default firebaseConfig;

@@ -3,19 +3,22 @@ import PropTypes from 'prop-types';
 import ReactRouterPropTypes from 'react-router-prop-types';
 
 import { Field, Formik } from 'formik';
-import { compose } from 'recompose';
+import { compose } from '../../utils';
 import { withRouter } from 'react-router';
 import { validateField as validate, validateEmail } from '../../utils';
 import Firebase, { withFirebase } from '../../contexts/Firebase';
 import { DASHBOARD } from '../../constants/routes';
 
-const SignIn = props => (
+const SignIn = props => {
+  const [errorMessage, setErrorMessage] = React.useState('');
+  return (
   <Formik
     initialValues={{ email: '', password: '' }}
     onSubmit={(values) => {
       const { firebase, history } = props;
-      firebase.signInUser(values);
-      history.push(DASHBOARD);
+      return firebase.signInUser(values)
+        .then(() => history.push(DASHBOARD))
+        .catch(error => setErrorMessage(error.message));
     }}
     render={(formikProps) => {
       const {
@@ -28,6 +31,7 @@ const SignIn = props => (
 
       return (
         <form onSubmit={handleSubmit}>
+          {errorMessage && <div role="alert">{errorMessage}</div>}
           <div>
             <span>Email</span>
             <Field type="email" validate={validateEmail} name="email" />
@@ -59,7 +63,8 @@ const SignIn = props => (
       );
     }}
   />
-);
+  );
+};
 
 SignIn.propTypes = {
   firebase: PropTypes.instanceOf(Firebase).isRequired,

@@ -24,3 +24,5 @@ export const validateField = (value) => {
   }
   return errorMessage;
 };
+
+export const compose = (...enhancers) => Component => enhancers.reduceRight((component, enhance) => enhance(component), Component);

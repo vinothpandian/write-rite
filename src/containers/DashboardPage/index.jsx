@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { compose } from 'recompose';
+import { compose } from '../../utils';
 import { withTheme } from '../../contexts/Theme';
 import SignOut from '../../components/SignOut';
 import customProps from '../../proptypes';

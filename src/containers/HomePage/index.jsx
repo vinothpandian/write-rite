@@ -1,7 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { compose } from 'recompose';
+import { compose } from '../../utils';
 import SignUp from '../../components/SignUp';
 import SignIn from '../../components/SignIn';
 import { withAuthUser } from '../../contexts/Session';
